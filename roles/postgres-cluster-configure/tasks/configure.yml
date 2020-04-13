@@ -1,0 +1,19 @@
+---
+- name: Configure global settings.
+  lineinfile:
+    dest: "{{ postgresql_config_path }}/postgresql.conf"
+    regexp: "^#?{{ item.option }}.+$"
+    line: "{{ item.option }} = '{{ item.value }}'"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_global_config_options }}"
+
+- include_tasks: "restart_postgres.yml"
+
+- name: Ensure PostgreSQL unix socket dirs exist.
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: "{{ postgresql_unix_socket_directories_mode }}"
+  with_items: "{{ postgresql_unix_socket_directories }}"

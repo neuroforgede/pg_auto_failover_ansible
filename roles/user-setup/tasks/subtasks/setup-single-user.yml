@@ -1,0 +1,35 @@
+# pg_auto_failover_ansible
+
+# Copyright (C) 2020  NeuroForge GmbH & Co.KG <https://neuroforge.de/>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---
+# inspired by https://medium.com/sallesslice-com/visudo-with-ansible-746f83547bb3
+- name: user setup
+  become: yes
+  remote_user: root
+  block:
+    - name: "create user {{ user.name }}"
+      user:
+        name: "{{ user.name }}"
+        append: yes
+        shell: /bin/bash
+        create_home: yes
+
+    - name: "set up bashrc for user {{ user.name }}"
+      copy:
+        src: .bashrc
+        dest: "/home/{{ user.name }}/.bashrc"
+        owner: "{{ user.name }}"
+        group: "{{ user.group }}"

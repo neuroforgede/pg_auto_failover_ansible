@@ -1,0 +1,156 @@
+---
+- name: "initialize computed_postgresql_pga_entries"
+  set_fact:
+    computed_postgresql_pga_entries: "{{ postgresql_hba_entries }}"
+
+
+# - name: "add autoctl user to pg_hba entries"
+#   vars:
+#     new_entry:
+#       type: local
+#       database: "autoctl"
+#       user: "autoctl"
+#       auth_method: peer
+#   set_fact:
+#     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+#   when: postgresql_cluster_is_monitor | default('False') | bool
+
+
+# - name: "add autoctl_node user to pg_hba entries with peer login for each monitor node"
+#   vars:
+#     new_entry:
+#       type: local
+#       database: "autoctl"
+#       user: "autoctl"
+#       auth_method: peer
+#   set_fact:
+#     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+#   when: postgresql_cluster_is_monitor | default('False') | bool
+
+
+# - name: "add autoctl_node user to pg_hba entries for each monitor node"
+#   vars:
+#     new_entry:
+#       type: local
+#       database: "autoctl"
+#       user: "autoctl_node"
+#       auth_method: peer
+#       auth_options: "map=autoctl_node_peer"
+#   set_fact:
+#     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+#   when: postgresql_cluster_is_monitor | default('False') | bool
+
+- name: "add autoctl_node user to pg_hba entries for each monitor node"
+  vars:
+    new_entry:
+      type: local
+      database: "template1"
+      user: "autoctl_node"
+      auth_method: peer
+      auth_options: "map=autoctl_node_peer"
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  when: postgresql_cluster_is_monitor | default('False') | bool
+
+
+- name: "add autoctl_node user to pg_hba entries for each monitor node"
+  vars:
+    new_entry:
+      type: local
+      database: "pg_auto_failover"
+      user: "autoctl_node"
+      auth_method: peer
+      auth_options: "map=autoctl_node_peer"
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  when: postgresql_cluster_is_monitor | default('False') | bool
+
+
+- name: "add autoctl_node user to pg_hba entries for each cluster member for autoctl_node database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "autoctl"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "autoctl_node"
+      auth_method: cert
+      auth_options: "map=autoctl_node_remote"      
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+
+- name: "add autoctl_node user to pg_hba entries for each cluster member for template1 database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "template1"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "autoctl_node"
+      auth_method: cert
+      auth_options: "map=autoctl_node_remote"      
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+
+- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "pg_auto_failover"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "autoctl_node"
+      auth_method: cert
+      auth_options: "map=autoctl_node_remote"      
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+
+- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "replication"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "pgautofailover_replicator"
+      auth_method: cert
+      auth_options: "map=pgautofailover_replicator_remote"      
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+
+- name: "Configure pg_ident mapping for all cluster members and monitors"
+  template:
+    src: "pg_ident.conf.j2"
+    dest: "{{ postgresql_config_path }}/pg_ident.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0600
+    backup: yes
+    force: yes
+
+- name: "Configure host based authentication for all cluster members and monitors"
+  template:
+    src: "pg_hba.conf.j2"
+    dest: "{{ postgresql_config_path }}/pg_hba.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0600
+    backup: yes
+    force: yes
+  when: computed_postgresql_pga_entries | length > 0
+
+- include_tasks: "restart_postgres.yml"
+
+# TODO: move this to a separate role?
+- name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster members"
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+    to_port: "{{ postgresql_cluster_port | default('5433') }}"
+    comment: "PostgreSQL {{ postgresql_cluster_name }} - host: {{ hostvars[item]['inventory_hostname'] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"

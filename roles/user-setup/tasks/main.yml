@@ -1,0 +1,24 @@
+# pg_auto_failover_ansible
+
+# Copyright (C) 2020  NeuroForge GmbH & Co.KG <https://neuroforge.de/>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---
+- name: construct list of all user infos
+  set_fact:
+    all_user_infos: "{{ setup_additional_users | default([]) }}"
+
+- name: set up users
+  include: subtasks/setup-single-user.yml user="{{ item }}"
+  with_items: "{{ all_user_infos }}"

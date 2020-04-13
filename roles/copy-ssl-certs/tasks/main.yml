@@ -1,0 +1,54 @@
+# pg_auto_failover_ansible
+
+# Copyright (C) 2020  NeuroForge GmbH & Co.KG <https://neuroforge.de/>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---
+- name: "ensure /data/ansible exists"
+  file:
+    path: /data/ansible
+    state: directory
+
+- name: "ensure /data/ansible/certs exists"
+  file:
+    path: /data/ansible/certs
+    state: directory
+
+- name: "copy ssl certs to {{ item.directory }}"
+  copy:
+    src: "{{playbook_dir}}/files/certs/{{inventory_hostname}}/{{ item.directory }}"
+    dest: "/data/ansible/certs"
+    mode: 0700
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  when: not item.use_ids | default('False') | bool
+  with_items: "{{ ssl_cert_dirs }}"
+
+- name: "copy ssl certs to {{ item.directory }}"
+  copy:
+    src: "{{playbook_dir}}/files/certs/{{inventory_hostname}}/{{ item.directory }}"
+    dest: "/data/ansible/certs"
+    mode: 0700
+    owner: "{{ item.uid }}"
+    group: "{{ item.gid }}"
+  when: item.use_ids | default('False') | bool
+  with_items: "{{ ssl_cert_dirs }}"
+
+- name: "Ensure /data/ansible/certs/{{ item.directory }} is 0700"
+  command: chmod 700 /data/ansible/certs/{{ item.directory }}
+  with_items: "{{ ssl_cert_dirs }}"
+
+- name: "Ensure files in /data/ansible/certs/{{ item.directory }} 0400"
+  command: find /data/ansible/certs/{{ item.directory }} -type f -exec chmod 0400 {} \;
+  with_items: "{{ ssl_cert_dirs }}"

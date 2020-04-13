@@ -1,0 +1,51 @@
+# pg_auto_failover_ansible
+
+# Copyright (C) 2020  NeuroForge GmbH & Co.KG <https://neuroforge.de/>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---
+- name: "ensure /home/postgres/.postgresql exists"
+  file:
+    path: /home/postgres/.postgresql
+    state: directory
+    owner: "postgres"
+    group: "postgres"
+    mode: 0700
+
+- name: "copy key and cert to postgres user home"
+  copy:
+    src: "{{ postgresql_cluster_server_key | default('/data/ansible/certs/postgres_server/server.crt') }}"
+    dest: "/home/postgres/.postgresql/postgresql.cert"
+    owner: "postgres"
+    group: "users"
+    mode: 0600
+    remote_src: yes
+
+- name: "copy key and cert to postgres user home"
+  copy:
+    src: "{{ postgresql_cluster_server_key | default('/data/ansible/certs/postgres_server/server.crt') }}"
+    dest: "/home/postgres/.postgresql/postgresql.crt"
+    owner: "postgres"
+    group: "users"
+    mode: 0600
+    remote_src: yes
+
+- name: "copy key and cert to postgres user home"
+  copy:
+    src: "{{ postgresql_cluster_server_key | default('/data/ansible/certs/postgres_server/server.key') }}"
+    dest: "/home/postgres/.postgresql/postgresql.key"
+    owner: "postgres"
+    group: "users"
+    mode: 0600
+    remote_src: yes

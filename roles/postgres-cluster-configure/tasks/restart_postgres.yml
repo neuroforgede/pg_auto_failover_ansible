@@ -1,0 +1,10 @@
+---
+- name: "reload cluster config"
+  become_user: postgres
+  shell: >
+    PATH="$PATH:{{ postgresql_bin_path }}" pg_ctl reload --pgdata {{ postgresql_data_dir }}
+  
+- name: "restart pg_auto_failover service"
+  service:
+    name: "{{ postgresql_daemon }}"
+    state: "{{ postgresql_restarted_state }}"

@@ -1,0 +1,72 @@
+# pg_auto_failover_ansible
+
+# Copyright (C) 2020  NeuroForge GmbH & Co.KG <https://neuroforge.de/>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+---
+# careful: this is executed on the management node as well, so this should
+# really only include _essential_ software
+- name: Install essential packages
+  apt:
+    name: "{{ packages }}"
+    update_cache: "{{ apt_update_cache | default('True') }}"
+  vars:
+    packages:
+    - vim
+    - ufw
+    - sudo
+    - python-setuptools
+    - python-pip
+    - python-passlib
+    
+- name: configure and enable ufw
+  remote_user: root
+  become: true
+  block:
+    - name: Allow ssh connections via ipv4
+      ufw:
+        rule: allow
+        proto: tcp
+        to: 0.0.0.0/0
+        port: "22"
+        
+    - name: Allow ssh ipv6 connections via loopback
+      ufw:
+        rule: allow
+        proto: tcp
+        from: ::1
+        to: ::1
+        port: "22"
+
+    - name: Allow ssh ipv6 connections to ipv6 floating ip if configured
+      ufw:
+        rule: allow
+        proto: tcp
+        to: "{{ floating_ipv6 }}"
+        port: "22"
+      when: floating_ipv6 is defined
+
+    - name: Enable ufw
+      ufw:
+        state: enabled
+
+- name: molly guard
+  include_tasks: subtasks/molly-guard.yml
+
+- set_fact:
+    setup_disable_ipv6_val: "{{ setup_disable_ipv6 | default('False') }}"
+
+- name: Disable ipv6
+  raw: echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
+  when: setup_disable_ipv6_val|bool

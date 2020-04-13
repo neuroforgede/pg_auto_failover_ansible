@@ -1,0 +1,77 @@
+---
+- hosts: postgres_cluster
+  become: true
+  vars:
+    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
+    ansible_user: "root"
+    
+    apt_update_cache: True
+    apt_restart_after_dist_upgrade: True
+    setup_additional_groups:
+      - name: "postgres"
+        requires_root_password: True
+    setup_additional_users:
+      - name: "postgres"
+        group: "postgres"
+        is_sudo: False
+    ssl_cert_dirs:
+      - directory: "postgres_server"
+        owner: "postgres"
+        group: "postgres"
+  roles:
+    - role: user-setup
+    - role: force-reconnect
+    - role: copy-ssl-certs
+
+- hosts: postgres_cluster
+  become: true
+  vars:
+    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
+    ansible_user: "root"
+    
+    apt_update_cache: True
+
+    postgresql_user: postgres
+    postgresql_group: postgres
+    postgresql_hba_entries: "{{ postgresql_hba_entries_post }}"
+
+    postgresql_locales:
+      - 'en_US.UTF-8'
+
+    postgresql_global_config_options:
+      - option: unix_socket_directories
+        value: '{{ postgresql_unix_socket_directories | join(",") }}'
+
+  roles:
+    - role: postgres-pre-setup
+    - role: postgres-cluster-install
+    - role: postgres-cluster-user-setup
+    - role: postgres-cluster-pg-auto-failover-install
+    - role: postgres-cluster-monitor-initialize
+    # update all pg_hba configs for all already initialized nodes
+    - role: postgres-cluster-data-initialize-existing
+
+
+- hosts: postgres_cluster
+  become: true
+  serial: true
+  vars:
+    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
+    ansible_user: "root"
+    
+    apt_update_cache: True
+
+    postgresql_user: postgres
+    postgresql_group: postgres
+    postgresql_hba_entries: "{{ postgresql_hba_entries_post }}"
+
+    postgresql_locales:
+      - 'en_US.UTF-8'
+
+    postgresql_global_config_options:
+      - option: unix_socket_directories
+        value: '{{ postgresql_unix_socket_directories | join(",") }}'
+
+  roles:
+    # one by one add all new data nodes
+    - role: postgres-cluster-data-initialize-new
