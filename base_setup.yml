@@ -20,6 +20,18 @@
         owner: "0"
         group: "0"
         mode: 0600
+        
+- hosts: all
+  vars:
+    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
+    ansible_user: "root"
+  tasks:
+    - name: Ensure the en_US locale exists
+      locale_gen:
+        name: en_US.UTF-8
+        state: present
+    - name: set en_US as default locale
+      command: update-locale set-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 - hosts: all
   become: true

@@ -1,8 +1,8 @@
 ---
+
 - name: "initialize computed_postgresql_pga_entries"
   set_fact:
-    computed_postgresql_pga_entries: "{{ postgresql_hba_entries }}"
-
+    computed_postgresql_pga_entries: []
 
 # - name: "add autoctl user to pg_hba entries"
 #   vars:
@@ -121,6 +121,14 @@
     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
+- name: "add non system pg_hba entries for all data cluster members to pg_hba.conf"     
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_cluster_hba_entries | default([])) }}"
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "add default hba_entries to the end of computed_postgresql_pga_entries"
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_hba_entries | default([])) }}"
 
 - name: "Configure pg_ident mapping for all cluster members and monitors"
   template:
@@ -154,3 +162,13 @@
     to_port: "{{ postgresql_cluster_port | default('5433') }}"
     comment: "PostgreSQL {{ postgresql_cluster_name }} - host: {{ hostvars[item]['inventory_hostname'] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+- name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster clients"
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item.ip }}/32"
+    to_port: "{{ postgresql_cluster_port | default('5433') }}"
+    comment: "Client {{ postgresql_cluster_name }} - client: {{ item.name }}"
+  with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
