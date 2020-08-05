@@ -26,6 +26,7 @@
         append: yes
         shell: /bin/bash
         create_home: yes
+        system: "{{ user.system | default('False') | bool }}"
 
     - name: "set up bashrc for user {{ user.name }}"
       copy:
