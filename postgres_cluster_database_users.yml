@@ -1,0 +1,19 @@
+---
+
+- hosts: postgres_cluster
+  become: true
+  vars:
+    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
+    ansible_user: "root"
+
+    postgresql_user: postgres
+    postgresql_group: postgres
+
+    postgresql_global_config_options:
+      - option: unix_socket_directories
+        value: '{{ postgresql_unix_socket_directories | join(",") }}'
+
+  roles:
+    - role: postgres-cluster-users
+    - role: postgres-cluster-databases
+    - role: postgres-cluster-hba-config
