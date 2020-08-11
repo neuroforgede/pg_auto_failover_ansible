@@ -4,41 +4,21 @@
   set_fact:
     computed_postgresql_pga_entries: []
 
-# - name: "add autoctl user to pg_hba entries"
-#   vars:
-#     new_entry:
-#       type: local
-#       database: "autoctl"
-#       user: "autoctl"
-#       auth_method: peer
-#   set_fact:
-#     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
-#   when: postgresql_cluster_is_monitor | default('False') | bool
-
-
-# - name: "add autoctl_node user to pg_hba entries with peer login for each monitor node"
-#   vars:
-#     new_entry:
-#       type: local
-#       database: "autoctl"
-#       user: "autoctl"
-#       auth_method: peer
-#   set_fact:
-#     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
-#   when: postgresql_cluster_is_monitor | default('False') | bool
-
-
-# - name: "add autoctl_node user to pg_hba entries for each monitor node"
-#   vars:
-#     new_entry:
-#       type: local
-#       database: "autoctl"
-#       user: "autoctl_node"
-#       auth_method: peer
-#       auth_options: "map=autoctl_node_peer"
-#   set_fact:
-#     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
-#   when: postgresql_cluster_is_monitor | default('False') | bool
+- name: Ensure PostgreSQL pgautofailover_monitor user is present.
+  postgresql_user:
+    name: "pgautofailover_monitor"
+    login_host: "localhost"
+    login_user: "{{ postgresql_user }}"
+    login_unix_socket: "{{ postgresql_unix_socket_directories[0] }}"
+    port: "{{ postgresql_cluster_port }}"
+    state: "present"
+  no_log: "{{ postgres_users_no_log }}"
+  become: true
+  become_user: "{{ postgresql_user }}"
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
 
 - name: "add autoctl_node user to pg_hba entries for each monitor node"
   vars:
@@ -117,6 +97,19 @@
       user: "pgautofailover_replicator"
       auth_method: cert
       auth_options: "map=pgautofailover_replicator_remote"      
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "postgres"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "pgautofailover_monitor"
+      auth_method: cert
+      auth_options: "map=pgautofailover_monitor_remote"      
   set_fact:
     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"

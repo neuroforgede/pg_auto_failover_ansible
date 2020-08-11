@@ -30,7 +30,7 @@
 
 - name: "make sure database cluster service is started and enabled at boot"
   systemd:
-    state: restarted
+    state: started
     enabled: true
     daemon_reload: yes
     name: "{{ postgresql_daemon }}"

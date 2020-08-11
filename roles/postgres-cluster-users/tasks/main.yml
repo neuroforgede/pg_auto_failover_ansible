@@ -19,7 +19,7 @@
     port: "{{ item.port | default(postgresql_cluster_port) }}"
     state: "{{ item.state | default('present') }}"
   with_items: "{{ postgresql_users }}"
-  no_log: false #"{{ postgres_users_no_log }}"
+  no_log: "{{ postgres_users_no_log }}"
   become: true
   become_user: "{{ postgresql_user }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)

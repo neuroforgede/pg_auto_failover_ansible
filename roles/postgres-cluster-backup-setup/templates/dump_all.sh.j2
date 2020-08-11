@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DATE=`date '+%Y_%m_%d_%H_%M_%S'`
+
+su postgres -c "pg_basebackup --write-recovery-conf -X stream -F tar --gzip -p {{ postgresql_cluster_port | default('5433') }} -D /data/ansible/pg_dumps/pg_basebackup_${DATE}"
