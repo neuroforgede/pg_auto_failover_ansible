@@ -1,0 +1,20 @@
+- name: Ensure PostgreSQL database schema is present.
+  postgresql_schema:
+    name: "{{ schema_def.name }}"
+    database: "{{ database.name }}"
+    login_host: "{{ database.login_host | default('localhost') }}"
+    login_password: "{{ database.login_password | default(omit) }}"
+    login_user: "{{ database.login_user | default(postgresql_user) }}"
+    login_unix_socket: "{{ database.login_unix_socket | default(postgresql_unix_socket_directories[0]) }}"
+    port: "{{ database.port | default(postgresql_cluster_port) }}"
+    owner: "{{ schema_def.owner | default(database.owner | default(postgresql_user)) }}"
+    state: "{{ schema_def.state | default('present') }}"
+  become: true
+  become_user: "{{ postgresql_user }}"
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+  when: (not (postgresql_cluster_is_monitor | default('False') | bool)) and schema_def.name is defined
+  loop_control:
+    loop_var: "schema_def"
+  with_items: "{{ database.schemas | default([]) }}"
