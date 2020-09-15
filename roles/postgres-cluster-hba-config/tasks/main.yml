@@ -121,7 +121,8 @@
 
 - name: "add default hba_entries to the end of computed_postgresql_pga_entries"
   set_fact:
-    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_hba_entries | default([])) }}"
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_monitor_hba_entries | default([])) }}"
+  when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "Configure pg_ident mapping for all cluster members and monitors"
   template:

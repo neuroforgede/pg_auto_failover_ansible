@@ -30,8 +30,7 @@ postgresql_packages:
   - postgresql-contrib
   - libpq-dev
 
-postgresql_hba_entries:
-  - { type: local, database: all, user: postgres, auth_method: peer }
+postgresql_cluster_hba_entries:
   # add your entries for your manually created databases here
 
 postgresql_cluster_allowed_clients: []

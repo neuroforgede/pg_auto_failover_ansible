@@ -50,7 +50,7 @@ Control the state of the postgresql service and whether it should start at boot 
 
 Global configuration options that will be set in `postgresql.conf`. Note that for RHEL/CentOS 6 (or very old versions of PostgreSQL), you need to at least override this variable and set the `option` to `unix_socket_directory`.
 
-    postgresql_hba_entries:
+    _postgresql_hba_entries:
       - { type: local, database: all, user: postgres, auth_method: peer }
       - { type: local, database: all, user: all, auth_method: peer }
       - { type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: md5 }
