@@ -52,3 +52,5 @@ postgresql_databases: []
   #  encoding: 'UTF-8'
   #  owner: "dbowner"
   #  state: present
+  #  schemas:
+  #    - name: "private"
