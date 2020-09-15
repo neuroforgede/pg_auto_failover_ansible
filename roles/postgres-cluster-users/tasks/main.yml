@@ -18,7 +18,7 @@
     login_unix_socket: "{{ item.login_unix_socket | default(postgresql_unix_socket_directories[0]) }}"
     port: "{{ item.port | default(postgresql_cluster_port) }}"
     state: "{{ item.state | default('present') }}"
-  with_items: "{{ postgresql_users }}"
+  with_items: "{{ postgresql_cluster_users }}"
   no_log: "{{ postgres_users_no_log }}"
   become: true
   become_user: "{{ postgresql_user }}"

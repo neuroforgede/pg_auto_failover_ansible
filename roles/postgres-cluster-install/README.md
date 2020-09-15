@@ -74,7 +74,7 @@ If overriding, make sure you copy all of the existing entries from `defaults/mai
 
 (Debian/Ubuntu only) Used to generate the locales used by PostgreSQL databases.
 
-    postgresql_databases:
+    postgresql_cluster_databases:
       - name: exampledb # required; the rest are optional
         lc_collate: # defaults to 'en_US.UTF-8'
         lc_ctype: # defaults to 'en_US.UTF-8'
@@ -90,7 +90,7 @@ If overriding, make sure you copy all of the existing entries from `defaults/mai
 
 A list of databases to ensure exist on the server. Only the `name` is required; all other properties are optional.
 
-    postgresql_users:
+    postgresql_cluster_users:
       - name: jdoe #required; the rest are optional
         password: # defaults to not set
         encrypted: # defaults to not set
@@ -134,9 +134,9 @@ None.
 
 *Inside `vars/main.yml`*:
 
-    postgresql_databases:
+    postgresql_cluster_databases:
       - name: example_db
-    postgresql_users:
+    postgresql_cluster_users:
       - name: example_user
         password: supersecure
 
