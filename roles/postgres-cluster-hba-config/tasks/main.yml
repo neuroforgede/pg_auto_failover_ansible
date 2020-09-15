@@ -114,12 +114,16 @@
     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
+- name: "add default hba_entries to the end of computed_postgresql_pga_entries"
+  set_fact:
+    computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (_postgresql_hba_entries | default([])) }}"
+
 - name: "add non system pg_hba entries for all data cluster members to pg_hba.conf"     
   set_fact:
     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_cluster_hba_entries | default([])) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "add default hba_entries to the end of computed_postgresql_pga_entries"
+- name: "add non system pg_hba entries for monitor to the end of computed_postgresql_pga_entries"
   set_fact:
     computed_postgresql_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_monitor_hba_entries | default([])) }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
