@@ -6,6 +6,10 @@
     path: "{{ postgresql_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
+- name: Check if service is already set up
+  stat:
+    path: "/etc/systemd/system/{{ postgresql_daemon }}.service"
+  register: postgresql_daemon_service_file
 
 - include_tasks: existing_node.yml
-  when: (pgdata_dir_version.stat.exists) and not (postgresql_cluster_is_monitor | default('False') | bool)
+  when: (pgdata_dir_version.stat.exists) and (postgresql_daemon_service_file.stat.exists) and not (postgresql_cluster_is_monitor | default('False') | bool)

@@ -5,4 +5,6 @@
 
 - include_role:
     name: postgres-cluster-configure
+  vars:
+    postgresql_cluster_skip_restart: true
   when: not (postgresql_cluster_is_monitor | default('False') | bool)

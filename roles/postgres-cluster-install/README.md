@@ -19,9 +19,6 @@ Available variables are listed below, along with default values (see `defaults/m
 
     postgresql_enablerepo: ""
 
-(RHEL/CentOS only) You can set a repo to use for the PostgreSQL installation by passing it in here.
-
-    postgresql_restarted_state: "restarted"
 
 Set the state of the service when configuration changes are made. Recommended values are `restarted` or `reloaded`.
 

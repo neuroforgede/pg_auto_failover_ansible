@@ -9,3 +9,11 @@
 
 - include_tasks: new_node.yml
   when: (not pgdata_dir_version.stat.exists) and not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: Check if service is already set up
+  stat:
+    path: "/etc/systemd/system/{{ postgresql_daemon }}.service"
+  register: postgresql_daemon_service_file
+
+- include_tasks: setup_service.yml
+  when: (not postgresql_daemon_service_file.stat.exists) and not (postgresql_cluster_is_monitor | default('False') | bool)

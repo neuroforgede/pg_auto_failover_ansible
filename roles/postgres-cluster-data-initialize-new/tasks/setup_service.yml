@@ -1,0 +1,22 @@
+---
+- name: "create systemd config for cluster"
+  shell: >
+    su -c 'PATH="$PATH:{{ postgresql_bin_path }}" pg_autoctl -q show systemd --pgdata "{{ postgresql_data_dir }}"' postgres \
+    | tee /etc/systemd/system/{{ postgresql_daemon }}.service
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "make sure database cluster service is started and enabled at boot"
+  systemd:
+    state: started
+    enabled: true
+    daemon_reload: yes
+    name: "{{ postgresql_daemon }}"
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- include_role:
+    name: postgres-cluster-hba-config
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- include_role:
+    name: postgres-cluster-configure
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)

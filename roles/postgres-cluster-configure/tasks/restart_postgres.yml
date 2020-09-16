@@ -8,3 +8,4 @@
   service:
     name: "{{ postgresql_daemon }}"
     state: "{{ postgresql_restarted_state }}"
+  when: not (postgresql_cluster_skip_restart | default('False') | bool)
