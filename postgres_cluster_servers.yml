@@ -43,6 +43,7 @@
         value: '{{ postgresql_unix_socket_directories | join(",") }}'
 
   roles:
+    - name: postgres-cluster-load-vars
     - role: postgres-pre-setup
     - role: postgres-cluster-install
     - role: postgres-cluster-user-setup
@@ -69,6 +70,7 @@
         value: '{{ postgresql_unix_socket_directories | join(",") }}'
 
   roles:
+    - name: postgres-cluster-load-vars
     # one by one add all new data nodes
     - role: postgres-cluster-data-initialize-new
 
@@ -86,5 +88,6 @@
         value: '{{ postgresql_unix_socket_directories | join(",") }}'
 
   roles:
+    - name: postgres-cluster-load-vars
     - role: postgres-cluster-users
     - role: postgres-cluster-databases

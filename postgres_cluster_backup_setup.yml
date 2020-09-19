@@ -14,4 +14,5 @@
         value: '{{ postgresql_unix_socket_directories | join(",") }}'
 
   roles:
+    - name: postgres-cluster-load-vars
     - name: postgres-cluster-backup-setup

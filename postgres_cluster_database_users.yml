@@ -14,6 +14,7 @@
         value: '{{ postgresql_unix_socket_directories | join(",") }}'
 
   roles:
+    - name: postgres-cluster-load-vars
     - role: postgres-cluster-users
     - role: postgres-cluster-databases
     - role: postgres-cluster-hba-config

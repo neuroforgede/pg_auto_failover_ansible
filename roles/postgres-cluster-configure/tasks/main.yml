@@ -1,7 +1,4 @@
 ---
-# Variable configuration.
-- include_tasks: variables.yml
-
 - include_tasks: configure.yml
 
 # TODO: smart deletion of default cluster, we dont need it
