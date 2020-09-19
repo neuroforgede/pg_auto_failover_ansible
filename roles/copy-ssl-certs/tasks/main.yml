@@ -27,7 +27,7 @@
 
 - name: "copy ssl certs to {{ item.directory }}"
   copy:
-    src: "{{playbook_dir}}/files/certs/{{inventory_hostname}}/{{ item.directory }}"
+    src: "{{ssl_certs_base_dir}}/{{ item.directory }}"
     dest: "/data/ansible/certs"
     mode: 0700
     owner: "{{ item.owner }}"
@@ -37,7 +37,7 @@
 
 - name: "copy ssl certs to {{ item.directory }}"
   copy:
-    src: "{{playbook_dir}}/files/certs/{{inventory_hostname}}/{{ item.directory }}"
+    src: "{{ssl_certs_base_dir}}/{{ item.directory }}"
     dest: "/data/ansible/certs"
     mode: 0700
     owner: "{{ item.uid }}"
