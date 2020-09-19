@@ -7,5 +7,5 @@
 - name: "restart pg_auto_failover service"
   service:
     name: "{{ postgresql_cluster_daemon }}"
-    state: "{{ postgresql_restarted_state }}"
+    state: "{{ postgresql_cluster_restarted_state }}"
   when: not (postgresql_cluster_skip_restart | default('False') | bool)

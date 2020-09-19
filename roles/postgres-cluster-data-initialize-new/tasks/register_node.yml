@@ -3,7 +3,7 @@
   vars:
     monitor_node_ip : "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}"
   set_fact:
-    postgresql_cluster_monitor_node_ips: "{{ (postgresql_monitor_node_ips | default([])) + [monitor_node_ip] }}"
+    postgresql_cluster_monitor_node_ips: "{{ (postgresql_cluster_monitor_node_ips | default([])) + [monitor_node_ip] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 
@@ -18,7 +18,7 @@
   # poll every 10 seconds to see if we are finished
   poll: 10
   vars:
-    first_monitor_node: "{{ postgresql_monitor_node_ips | first }}"
+    first_monitor_node: "{{ postgresql_cluster_monitor_node_ips | first }}"
   shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl create postgres \
     --pgdata "{{ postgresql_cluster_data_dir }}" \

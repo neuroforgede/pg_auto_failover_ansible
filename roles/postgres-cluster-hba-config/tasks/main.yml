@@ -5,9 +5,9 @@
     name: psycopg2
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "initialize computed_postgresql_pga_entries"
+- name: "initialize computed_postgresql_cluster_pg_hba_entries"
   set_fact:
-    computed_postgresql_pga_entries: []
+    computed_postgresql_cluster_pg_hba_entries: []
 
 - name: Ensure PostgreSQL pgautofailover_monitor user is present.
   postgresql_user:
@@ -34,7 +34,7 @@
       auth_method: peer
       auth_options: "map=autoctl_node_peer"
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   when: postgresql_cluster_is_monitor | default('False') | bool
 
 
@@ -47,7 +47,7 @@
       auth_method: peer
       auth_options: "map=autoctl_node_peer"
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   when: postgresql_cluster_is_monitor | default('False') | bool
 
 
@@ -61,7 +61,7 @@
       auth_method: cert
       auth_options: "map=autoctl_node_remote"      
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 
@@ -75,7 +75,7 @@
       auth_method: cert
       auth_options: "map=autoctl_node_remote"      
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 
@@ -89,7 +89,7 @@
       auth_method: cert
       auth_options: "map=autoctl_node_remote"      
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 
@@ -103,7 +103,7 @@
       auth_method: cert
       auth_options: "map=pgautofailover_replicator_remote"      
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 - name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
@@ -116,21 +116,21 @@
       auth_method: cert
       auth_options: "map=pgautofailover_monitor_remote"      
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + [new_entry] }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
-- name: "add default hba_entries to the end of computed_postgresql_pga_entries"
+- name: "add default hba_entries to the end of computed_postgresql_cluster_pg_hba_entries"
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + (_postgresql_cluster_minimum_hba_entries | default([])) }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + (_postgresql_cluster_minimum_hba_entries | default([])) }}"
 
 - name: "add non system pg_hba entries for all data cluster members to pg_hba.conf"     
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_cluster_hba_entries | default([])) }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + (postgresql_cluster_hba_entries | default([])) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "add non system pg_hba entries for monitor to the end of computed_postgresql_pga_entries"
+- name: "add non system pg_hba entries for monitor to the end of computed_postgresql_cluster_pg_hba_entries"
   set_fact:
-    computed_postgresql_cluster_pga_entries: "{{ computed_postgresql_pga_entries + (postgresql_monitor_hba_entries | default([])) }}"
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + (postgresql_monitor_hba_entries | default([])) }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "Configure pg_ident mapping for all cluster members and monitors"
@@ -152,7 +152,7 @@
     mode: 0600
     backup: yes
     force: yes
-  when: computed_postgresql_pga_entries | length > 0
+  when: computed_postgresql_cluster_pg_hba_entries | length > 0
 
 - include_tasks: "restart_postgres.yml"
 

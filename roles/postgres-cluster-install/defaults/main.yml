@@ -1,6 +1,6 @@
 ---
 
-postgresql_python_library: python-psycopg2
+postgresql_cluster_python_library: python-psycopg2
 postgresql_cluster_user: postgres
 
 postgresql_cluster_unix_socket_directories:
@@ -15,5 +15,5 @@ _postgresql_cluster_minimum_hba_entries:
   - {type: host, database: all, user: all, address: '::1/128', auth_method: md5}
 
 # Debian only. Used to generate the locales used by PostgreSQL databases.
-postgresql_locales:
+postgresql_cluster_locales:
   - 'en_US.UTF-8'

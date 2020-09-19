@@ -4,6 +4,6 @@
 #
 # See: https://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
 
-{% for client in computed_postgresql_pga_entries %}
+{% for client in computed_postgresql_cluster_pg_hba_entries %}
 {{ client.type }} {{ client.database }} {{ client.user }} {{ client.address|default('') }} {{ client.ip_address|default('') }} {{ client.ip_mask|default('') }} {{ client.auth_method }} {{ client.auth_options|default("") }}
 {% endfor %}

@@ -9,10 +9,10 @@
     postgresql_cluster_packages: "{{ __postgresql_cluster_packages | list }}"
   when: postgresql_cluster_packages is not defined
 
-- name: Define postgresql_version.
+- name: Define postgresql_cluster_version.
   set_fact:
-    postgresql_cluster_version: "{{ __postgresql_version }}"
-  when: postgresql_version is not defined
+    postgresql_cluster_version: "{{ __postgresql_cluster_version }}"
+  when: postgresql_cluster_version is not defined
 
 - name: Define postgresql_cluster_daemon.
   set_fact:
