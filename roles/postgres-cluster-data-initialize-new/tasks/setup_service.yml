@@ -1,7 +1,7 @@
 ---
 - name: "create systemd config for cluster"
   shell: >
-    su -c 'PATH="$PATH:{{ postgresql_bin_path }}" pg_autoctl -q show systemd --pgdata "{{ postgresql_data_dir }}"' postgres \
+    su -c 'PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl -q show systemd --pgdata "{{ postgresql_cluster_data_dir }}"' postgres \
     | tee /etc/systemd/system/{{ postgresql_daemon }}.service
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 

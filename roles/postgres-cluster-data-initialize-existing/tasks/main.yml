@@ -3,7 +3,7 @@
 
 - name: Check if PostgreSQL database is initialized.
   stat:
-    path: "{{ postgresql_data_dir }}/PG_VERSION"
+    path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
 - name: check if pg_autoctl already knows about this postgres cluster

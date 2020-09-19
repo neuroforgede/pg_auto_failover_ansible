@@ -3,7 +3,7 @@
 
 - name: Check if PostgreSQL database is initialized.
   stat:
-    path: "{{ postgresql_data_dir }}/PG_VERSION"
+    path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
 
@@ -18,8 +18,8 @@
 - name: "run pg_autoctl create monitor"
   become_user: "{{ postgresql_cluster_user }}"
   shell: >
-    PATH="$PATH:{{ postgresql_bin_path }}" pg_autoctl create monitor \
-    --pgdata "{{ postgresql_data_dir }}" \
+    PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl create monitor \
+    --pgdata "{{ postgresql_cluster_data_dir }}" \
     --skip-pg-hba \
     --ssl-ca-file "{{ postgresql_cluster_ssl_ca_file | default('/data/ansible/certs/postgres_server/rootCA.crt') }}" \
     --server-key "{{ postgresql_cluster_server_key | default('/data/ansible/certs/postgres_server/server.key') }}" \
@@ -30,7 +30,7 @@
 
 - name: "create systemd config for cluster"
   shell: >
-    su -c 'PATH="$PATH:{{ postgresql_bin_path }}" pg_autoctl -q show systemd --pgdata "{{ postgresql_data_dir }}"' postgres \
+    su -c 'PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl -q show systemd --pgdata "{{ postgresql_cluster_data_dir }}"' postgres \
     | tee /etc/systemd/system/{{ postgresql_daemon }}.service
   when: (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
 
@@ -51,4 +51,4 @@
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 
-#PATH="$PATH:{{ postgresql_bin_path }}" pg_ctl stop --pgdata $(pwd)
+#PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_ctl stop --pgdata $(pwd)

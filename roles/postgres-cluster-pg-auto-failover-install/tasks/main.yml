@@ -2,7 +2,7 @@
 
 - name: Check if PostgreSQL database is initialized.
   stat:
-    path: "{{ postgresql_data_dir }}/PG_VERSION"
+    path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
 - name: "copy deb.sh to /tmp/pg_auto_failover_deb.sh"

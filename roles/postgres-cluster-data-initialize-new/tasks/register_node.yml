@@ -20,8 +20,8 @@
   vars:
     first_monitor_node: "{{ postgresql_monitor_node_ips | first }}"
   shell: >
-    PATH="$PATH:{{ postgresql_bin_path }}" pg_autoctl create postgres \
-    --pgdata "{{ postgresql_data_dir }}" \
+    PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl create postgres \
+    --pgdata "{{ postgresql_cluster_data_dir }}" \
     --skip-pg-hba \
     --formation {{ postgresql_cluster_formation | default('default') }} \
     --ssl-ca-file "{{ postgresql_cluster_ssl_ca_file | default('/data/ansible/certs/postgres_server/rootCA.crt') }}" \

@@ -19,20 +19,20 @@
     postgresql_cluster_daemon: "{{ __postgresql_daemon }}"
   when: postgresql_daemon is not defined
 
-- name: Define postgresql_data_dir.
+- name: Define postgresql_cluster_data_dir.
   set_fact:
-    postgresql_cluster_data_dir: "{{ __postgresql_data_dir }}"
-  when: postgresql_data_dir is not defined
+    postgresql_cluster_data_dir: "{{ __postgresql_cluster_data_dir }}"
+  when: postgresql_cluster_data_dir is not defined
 
 - name: Define postgresql_cluster_port.
   set_fact:
     postgresql_cluster_port: "{{ __postgresql_cluster_port }}"
   when: postgresql_cluster_port is not defined
 
-- name: Define postgresql_bin_path.
+- name: Define postgresql_cluster_bin_path.
   set_fact:
-    postgresql_cluster_bin_path: "{{ __postgresql_bin_path }}"
-  when: postgresql_bin_path is not defined
+    postgresql_cluster_bin_path: "{{ __postgresql_cluster_bin_path }}"
+  when: postgresql_cluster_bin_path is not defined
 
 - name: Define postgresql_config_path.
   set_fact:
