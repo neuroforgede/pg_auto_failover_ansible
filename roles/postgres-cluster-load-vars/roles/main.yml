@@ -14,10 +14,10 @@
     postgresql_cluster_version: "{{ __postgresql_version }}"
   when: postgresql_version is not defined
 
-- name: Define postgresql_daemon.
+- name: Define postgresql_cluster_daemon.
   set_fact:
-    postgresql_cluster_daemon: "{{ __postgresql_daemon }}"
-  when: postgresql_daemon is not defined
+    postgresql_cluster_daemon: "{{ __postgresql_cluster_daemon }}"
+  when: postgresql_cluster_daemon is not defined
 
 - name: Define postgresql_cluster_data_dir.
   set_fact:
@@ -34,10 +34,10 @@
     postgresql_cluster_bin_path: "{{ __postgresql_cluster_bin_path }}"
   when: postgresql_cluster_bin_path is not defined
 
-- name: Define postgresql_config_path.
+- name: Define postgresql_cluster_config_path.
   set_fact:
-    postgresql_cluster_config_path: "{{ __postgresql_config_path }}"
-  when: postgresql_config_path is not defined
+    postgresql_cluster_config_path: "{{ __postgresql_cluster_config_path }}"
+  when: postgresql_cluster_config_path is not defined
 
 - name: Define postgresql_cluster_unix_socket_directories_mode.
   set_fact:

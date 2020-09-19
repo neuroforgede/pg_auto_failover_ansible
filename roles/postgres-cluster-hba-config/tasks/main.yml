@@ -136,7 +136,7 @@
 - name: "Configure pg_ident mapping for all cluster members and monitors"
   template:
     src: "pg_ident.conf.j2"
-    dest: "{{ postgresql_config_path }}/pg_ident.conf"
+    dest: "{{ postgresql_cluster_config_path }}/pg_ident.conf"
     owner: "{{ postgresql_cluster_user }}"
     group: "{{ postgresql_cluster_group }}"
     mode: 0600
@@ -146,7 +146,7 @@
 - name: "Configure host based authentication for all cluster members and monitors"
   template:
     src: "pg_hba.conf.j2"
-    dest: "{{ postgresql_config_path }}/pg_hba.conf"
+    dest: "{{ postgresql_cluster_config_path }}/pg_hba.conf"
     owner: "{{ postgresql_cluster_user }}"
     group: "{{ postgresql_cluster_group }}"
     mode: 0600
