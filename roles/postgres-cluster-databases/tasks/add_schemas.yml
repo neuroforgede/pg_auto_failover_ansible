@@ -4,13 +4,13 @@
     database: "{{ database.name }}"
     login_host: "{{ database.login_host | default('localhost') }}"
     login_password: "{{ database.login_password | default(omit) }}"
-    login_user: "{{ database.login_user | default(postgresql_user) }}"
-    login_unix_socket: "{{ database.login_unix_socket | default(postgresql_unix_socket_directories[0]) }}"
+    login_user: "{{ database.login_user | default(postgresql_cluster_user) }}"
+    login_unix_socket: "{{ database.login_unix_socket | default(postgresql_cluster_unix_socket_directories[0]) }}"
     port: "{{ database.port | default(postgresql_cluster_port) }}"
-    owner: "{{ schema_def.owner | default(database.owner | default(postgresql_user)) }}"
+    owner: "{{ schema_def.owner | default(database.owner | default(postgresql_cluster_user)) }}"
     state: "{{ schema_def.state | default('present') }}"
   become: true
-  become_user: "{{ postgresql_user }}"
+  become_user: "{{ postgresql_cluster_user }}"
   # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
   vars:
     ansible_ssh_pipelining: true

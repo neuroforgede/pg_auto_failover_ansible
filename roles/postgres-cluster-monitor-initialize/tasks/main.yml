@@ -16,7 +16,7 @@
 
 # TODO: add support for crl files
 - name: "run pg_autoctl create monitor"
-  become_user: "{{ postgresql_user }}"
+  become_user: "{{ postgresql_cluster_user }}"
   shell: >
     PATH="$PATH:{{ postgresql_bin_path }}" pg_autoctl create monitor \
     --pgdata "{{ postgresql_data_dir }}" \

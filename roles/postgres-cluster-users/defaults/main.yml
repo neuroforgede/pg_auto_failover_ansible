@@ -1,8 +1,8 @@
 ---
 
-postgresql_user: postgres
+postgresql_cluster_user: postgres
 
-postgresql_unix_socket_directories:
+postgresql_cluster_unix_socket_directories:
   - /var/run/postgresql
 
 # Users to ensure exist.
@@ -15,8 +15,8 @@ postgresql_cluster_users: []
 #   db: # defaults to not set
 #   login_host: # defaults to 'localhost'
 #   login_password: # defaults to not set
-#   login_user: # defaults to '{{ postgresql_user }}'
-#   login_unix_socket: # defaults to 1st of postgresql_unix_socket_directories
+#   login_user: # defaults to '{{ postgresql_cluster_user }}'
+#   login_unix_socket: # defaults to 1st of postgresql_cluster_unix_socket_directories
 #   port: # defaults to not set
 #   state: # defaults to 'present'
 

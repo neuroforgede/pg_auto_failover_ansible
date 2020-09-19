@@ -5,7 +5,7 @@
     regexp: "^#?{{ item.option }}.+$"
     line: "{{ item.option }} = '{{ item.value }}'"
     state: "{{ item.state | default('present') }}"
-  with_items: "{{ postgresql_global_config_options }}"
+  with_items: "{{ postgresql_cluster_global_config_options }}"
 
 - include_tasks: "restart_postgres.yml"
 
@@ -13,7 +13,7 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ postgresql_user }}"
-    group: "{{ postgresql_group }}"
-    mode: "{{ postgresql_unix_socket_directories_mode }}"
-  with_items: "{{ postgresql_unix_socket_directories }}"
+    owner: "{{ postgresql_cluster_user }}"
+    group: "{{ postgresql_cluster_group }}"
+    mode: "{{ postgresql_cluster_unix_socket_directories_mode }}"
+  with_items: "{{ postgresql_cluster_unix_socket_directories }}"
