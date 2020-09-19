@@ -4,10 +4,10 @@
   include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version.split('.')[0] }}.yml"
   when: ansible_os_family == 'Debian'
 
-- name: Define postgresql_packages.
+- name: Define postgresql_cluster_packages.
   set_fact:
-    postgresql_cluster_packages: "{{ __postgresql_packages | list }}"
-  when: postgresql_packages is not defined
+    postgresql_cluster_packages: "{{ __postgresql_cluster_packages | list }}"
+  when: postgresql_cluster_packages is not defined
 
 - name: Define postgresql_version.
   set_fact:

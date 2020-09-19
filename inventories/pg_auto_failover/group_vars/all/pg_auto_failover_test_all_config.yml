@@ -27,7 +27,7 @@
 
 #postgresql_cluster_daemon: postgresql_{{ postgresql_cluster_name }}
 
-#postgresql_packages:
+#postgresql_cluster_packages:
 #  - postgresql
 #  - postgresql-contrib
 #  - libpq-dev

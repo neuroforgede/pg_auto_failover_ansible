@@ -6,7 +6,7 @@ __postgresql_cluster_data_dir: "/var/lib/postgresql/{{ postgresql_version | defa
 __postgresql_cluster_bin_path: "/usr/lib/postgresql/{{ postgresql_version | default(__postgresql_version) }}/bin"
 __postgresql_cluster_config_path: "/etc/postgresql/{{ postgresql_version | default(__postgresql_version) }}/{{ postgresql_cluster_name | default(__postgresql_cluster_name) }}"
 __postgresql_cluster_daemon: "postgresql_{{ postgresql_cluster_name | default(__postgresql_cluster_name) }}"
-__postgresql_packages:
+__postgresql_cluster_packages:
   - postgresql
   - postgresql-contrib
   - libpq-dev
