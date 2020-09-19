@@ -6,6 +6,12 @@
     path: "{{ postgresql_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
+
+- name: check if pg_autoctl already knows about this postgres cluster
+  stat:
+    path: "/home/postgres/.local/share/pg_autoctl/var/lib/{{ postgresql_cluster_name }}"
+  register: pg_autoctl_dir
+
 # explicitly do not remove the data dir here, we do not want to delete database clusters by accident
 
 # TODO: add support for crl files
@@ -20,7 +26,7 @@
     --server-cert "{{ postgresql_cluster_server_cert | default('/data/ansible/certs/postgres_server/server.crt') }}" \
     --nodename "{{ host_ip }}" \
     --pgport "{{ postgresql_cluster_port | default('5433') }}"
-  when: (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
+  when: (not pg_autoctl_dir.stat.exists) and (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "create systemd config for cluster"
   shell: >
