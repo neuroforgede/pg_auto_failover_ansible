@@ -31,17 +31,6 @@
     ansible_user: "root"
     
     apt_update_cache: True
-
-    postgresql_cluster_user: postgres
-    postgresql_cluster_group: postgres
-
-    postgresql_locales:
-      - 'en_US.UTF-8'
-
-    postgresql_cluster_global_config_options:
-      - option: unix_socket_directories
-        value: '{{ postgresql_cluster_unix_socket_directories | join(",") }}'
-
   roles:
     - name: postgres-cluster-load-vars
     - role: postgres-pre-setup
@@ -61,14 +50,6 @@
     ansible_user: "root"
     
     apt_update_cache: True
-
-    postgresql_cluster_user: postgres
-    postgresql_cluster_group: postgres
-
-    postgresql_cluster_global_config_options:
-      - option: unix_socket_directories
-        value: '{{ postgresql_cluster_unix_socket_directories | join(",") }}'
-
   roles:
     - name: postgres-cluster-load-vars
     # one by one add all new data nodes
@@ -79,14 +60,6 @@
   vars:
     ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
     ansible_user: "root"
-
-    postgresql_cluster_user: postgres
-    postgresql_cluster_group: postgres
-
-    postgresql_cluster_global_config_options:
-      - option: unix_socket_directories
-        value: '{{ postgresql_cluster_unix_socket_directories | join(",") }}'
-
   roles:
     - name: postgres-cluster-load-vars
     - role: postgres-cluster-users
