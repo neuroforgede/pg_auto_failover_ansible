@@ -46,3 +46,5 @@
     - name: postgres-cluster-load-vars
     - role: postgres-cluster-users
     - role: postgres-cluster-databases
+    # not really needed as this is already done during setup, but does not hurt
+    - role: postgres-cluster-hba-config
