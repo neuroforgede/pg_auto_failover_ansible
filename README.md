@@ -23,6 +23,15 @@ The following roles are based on [geerlingguy's work](https://github.com/geerlin
 - passbolt-cluster-hba-config
 - passbolt-cluster-install
 
+## Testing
+
+Requirements:
+
+- vagrant
+- psql
+
+To test out the functionality and/or want to run the tests for this project, go to `tests/` and run `bash setup_for_test.sh` and then `run.sh`.
+
 ## Usage
 
 ### Setup Inventory
