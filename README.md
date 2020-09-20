@@ -31,7 +31,7 @@ Requirements:
 - virtualbox
 - psql
 
-To test out the functionality and/or want to run the tests for this project, go to `tests/` and run `bash setup_for_test.sh` and then `run.sh`.
+To test out the functionality and/or want to run the tests for this project, go to `test/` and run `bash setup_for_test.sh` and then `run.sh`.
 
 ## Usage
 
