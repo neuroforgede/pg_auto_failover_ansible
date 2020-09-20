@@ -4,6 +4,12 @@
     name: psycopg2
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
+- name: "check if server is standby (pg_is_in_recovery)"
+  shell: 
+    psql -p "{{ postgresql_cluster_port }}" -t -X -A -c 'select pg_is_in_recovery()'
+  become_user: "{{ postgresql_cluster_user }}"
+  register: pg_is_in_recovery
+
 - name: Ensure PostgreSQL users are present.
   postgresql_user:
     name: "{{ item.name }}"
@@ -22,7 +28,7 @@
   no_log: "{{ postgres_users_no_log }}"
   become: true
   become_user: "{{ postgresql_cluster_user }}"
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  when: not (postgresql_cluster_is_monitor | default('False') | bool) and pg_is_in_recovery.stdout_lines[0] == 'f'
   # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
   vars:
     ansible_ssh_pipelining: true
