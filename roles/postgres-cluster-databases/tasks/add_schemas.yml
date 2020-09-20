@@ -14,7 +14,7 @@
   # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
   vars:
     ansible_ssh_pipelining: true
-  when: (not (postgresql_cluster_is_monitor | default('False') | bool)) and schema_def.name is defined
+  when: (not (postgresql_cluster_is_monitor | default('False') | bool)) and schema_def.name is defined and pg_is_in_recovery.stdout_lines[0] == 'f'
   loop_control:
     loop_var: "schema_def"
   with_items: "{{ database.schemas | default([]) }}"
