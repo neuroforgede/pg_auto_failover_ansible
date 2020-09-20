@@ -8,7 +8,7 @@
 
 - name: check if pg_autoctl already knows about this postgres cluster
   stat:
-    path: "/home/postgres/.local/share/pg_autoctl/var/lib/{{ postgresql_cluster_name }}"
+    path: "/home/postgres/.local/share/pg_autoctl/{{ postgresql_cluster_data_dir }}"
   register: pg_autoctl_dir
 
 - name: Check if service is already set up

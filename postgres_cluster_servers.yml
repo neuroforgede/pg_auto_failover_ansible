@@ -2,11 +2,6 @@
 - hosts: postgres_cluster
   become: true
   vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
-    
-    apt_update_cache: True
-    apt_restart_after_dist_upgrade: True
     setup_additional_groups:
       - name: "postgres"
         requires_root_password: True
@@ -26,11 +21,6 @@
 
 - hosts: postgres_cluster
   become: true
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
-    
-    apt_update_cache: True
   roles:
     - name: postgres-cluster-load-vars
     - role: postgres-pre-setup
@@ -45,11 +35,6 @@
 - hosts: postgres_cluster
   become: true
   serial: true
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
-    
-    apt_update_cache: True
   roles:
     - name: postgres-cluster-load-vars
     # one by one add all new data nodes
@@ -57,9 +42,6 @@
 
 - hosts: postgres_cluster
   become: true
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
   roles:
     - name: postgres-cluster-load-vars
     - role: postgres-cluster-users

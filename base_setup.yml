@@ -1,7 +1,5 @@
 - hosts: all
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root" 
+  become: true
   gather_facts: False
   tasks:
     # ansible only requires only a minimal installation of python 2.x on the managed machines
@@ -9,9 +7,7 @@
       raw: apt update -y && apt install python-minimal -y && apt install python-simplejson -y
 
 - hosts: all
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
+  become: true
   tasks:
     - name: "set up bashrc for root user"
       copy:
@@ -22,9 +18,7 @@
         mode: 0600
         
 - hosts: all
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
+  become: true
   tasks:
     - name: Ensure the en_US locale exists
       locale_gen:
@@ -35,10 +29,7 @@
 
 - hosts: all
   become: true
-  vars:
-    ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-    ansible_user: "root"
-    
+  vars:   
     apt_update_cache: True
     apt_restart_after_dist_upgrade: True
   roles:

@@ -15,10 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ---
-
-ansible_ssh_private_key_file: "{{playbook_dir}}/ssh_keys/root_rsa"
-ansible_user: "root"
-
 postgresql_cluster_name: "main_cluster"
 postgresql_cluster_port: "5433"
 
