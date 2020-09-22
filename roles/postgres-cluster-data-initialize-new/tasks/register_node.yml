@@ -9,8 +9,8 @@
 
 # TODO: add support for crl files
 # FIXME: monitor port may be wrong if its overridden on a per host basis !!!
+#--group {{ postgresql_cluster_group | default('0') }} \
 
-# --group {{ postgresql_cluster_group | default('0') }} \
 - name: "run pg_autoctl create postgres"
   become_user: "{{ postgresql_cluster_user }}"
   # by default allow up to 5 hours for this command until it times out
