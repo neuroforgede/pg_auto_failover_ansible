@@ -27,7 +27,8 @@
     --ssl-ca-file "{{ postgresql_cluster_ssl_ca_file | default('/data/ansible/certs/postgres_server/rootCA.crt') }}" \
     --server-key "{{ postgresql_cluster_server_key | default('/data/ansible/certs/postgres_server/server.key') }}" \
     --server-cert "{{ postgresql_cluster_server_cert | default('/data/ansible/certs/postgres_server/server.crt') }}" \
-    --nodename "{{ host_ip }}" \
+    --name "{{ host_ip }}" \
+    --hostname "{{ host_ip }}" \
     --pgport "{{ postgresql_cluster_port | default('5433') }}" \
     --monitor postgres://autoctl_node@{{ first_monitor_node }}:{{ postgresql_cluster_port | default('5433') }}/pg_auto_failover
   when: not (postgresql_cluster_is_monitor | default('False') | bool)

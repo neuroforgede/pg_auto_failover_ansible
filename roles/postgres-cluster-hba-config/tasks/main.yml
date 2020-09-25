@@ -106,6 +106,20 @@
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
+
+- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "postgres"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "pgautofailover_replicator"
+      auth_method: cert
+      auth_options: "map=pgautofailover_replicator_remote"      
+  set_fact:
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
 - name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
     new_entry:
