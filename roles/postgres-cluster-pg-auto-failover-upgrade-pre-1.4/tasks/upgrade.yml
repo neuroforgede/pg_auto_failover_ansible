@@ -88,7 +88,6 @@
     counter=1
 
     echo "restarting monitor..."
-    #service {{ postgresql_cluster_daemon }} restart 
     echo "checking pgautofailover extension again..."
     current_version=$(su postgres -c "psql -p {{ postgresql_cluster_port }} -t -X -A -c \"select extversion from pg_extension where extname='pgautofailover';\" -d pg_auto_failover")
     echo "current_version: $current_version"
@@ -99,7 +98,6 @@
       sleep 1
 
       echo "restarting monitor..."
-      #service {{ postgresql_cluster_daemon }} restart
       echo "checking pgautofailover extension again..."
       current_version=$(su postgres -c "psql -p {{ postgresql_cluster_port }} -t -X -A -c \"select extversion from pg_extension where extname='pgautofailover';\" -d pg_auto_failover")
       echo "current_version: $current_version"
