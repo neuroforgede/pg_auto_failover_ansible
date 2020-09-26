@@ -7,7 +7,7 @@ __postgresql_cluster_bin_path: "/usr/lib/postgresql/{{ postgresql_cluster_versio
 __postgresql_cluster_config_path: "/var/lib/postgresql/{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}/{{ postgresql_cluster_name | default(__postgresql_cluster_name) }}"
 __postgresql_cluster_daemon: "postgresql_{{ postgresql_cluster_name | default(__postgresql_cluster_name) }}"
 __postgresql_cluster_packages:
-  - postgresql
-  - postgresql-contrib
+  - "postgresql-{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}"
+  - "postgresql-contrib-{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}"
   - libpq-dev
 postgresql_cluster_python_library: python3-psycopg2
