@@ -18,9 +18,9 @@
   command: "bash /tmp/pg_auto_failover_deb.sh"
   when: not pgdata_dir_version.stat.exists
 
-- name: "install postgresql-12-auto-failover-1.4"
+- name: "install postgresql-{{ postgresql_cluster_version }}-auto-failover-1.4"
   apt: 
-    name: postgresql-12-auto-failover-1.4
+    name: postgresql-{{ postgresql_cluster_version }}-auto-failover-1.4
     state: present
     update_cache: "{{ apt_update_cache | default('True') }}"
   when: not pgdata_dir_version.stat.exists

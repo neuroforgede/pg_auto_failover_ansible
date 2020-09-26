@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # we are testing, ignore host key checking
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts.yml ../base_setup.yml 
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts.yml ../postgres_cluster_servers.yml
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory_$1/hosts.yml ../base_setup.yml 
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory_$1/hosts.yml ../postgres_cluster_servers.yml
 
 node_1_check_recovery=`PGPASSWORD=password1 psql -h 10.0.0.11 -p 5433 -t -X -A -c 'select pg_is_in_recovery()' --username testuser -d testdb`
 node_2_check_recovery=`PGPASSWORD=password1 psql -h 10.0.0.12 -p 5433 -t -X -A -c 'select pg_is_in_recovery()' --username testuser -d testdb`
