@@ -82,8 +82,8 @@
 - name: "wait until the pg_auto_failover postgres extension has been upgraded on the master node"
   become: true
   async: "{{ postgresql_cluster_monitor_upgrade_timeout | default(300) | int }}"
-  # poll every 10 seconds to see if we are finished
-  poll: 10
+  # poll every 5 seconds to see if we are finished
+  poll: 5
   shell: |
     counter=1
 
