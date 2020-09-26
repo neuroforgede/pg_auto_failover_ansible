@@ -14,6 +14,16 @@
     postgresql_cluster_version: "{{ __postgresql_cluster_version }}"
   when: postgresql_cluster_version is not defined
 
+- name: "Define postgresql_pg_auto_failover_version."
+  set_fact:
+    postgresql_pg_auto_failover_version: "{{ __postgresql_pg_auto_failover_version }}"
+  when: postgresql_pg_auto_failover_version is not defined
+
+- name: "Define postgresql_repository."
+  set_fact:
+    postgresql_repository: "{{ __postgresql_repository }}"
+  when: postgresql_repository is not defined
+
 - name: Define postgresql_cluster_daemon.
   set_fact:
     postgresql_cluster_daemon: "{{ __postgresql_cluster_daemon }}"

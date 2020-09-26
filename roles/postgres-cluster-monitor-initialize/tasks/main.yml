@@ -15,17 +15,7 @@
 # explicitly do not remove the data dir here, we do not want to delete database clusters by accident
 
 # TODO: add support for crl files
-- name: "run pg_autoctl create monitor"
-  become_user: "{{ postgresql_cluster_user }}"
-  shell: >
-    PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl create monitor \
-    --pgdata "{{ postgresql_cluster_data_dir }}" \
-    --skip-pg-hba \
-    --ssl-ca-file "{{ postgresql_cluster_ssl_ca_file | default('/data/ansible/certs/postgres_server/rootCA.crt') }}" \
-    --server-key "{{ postgresql_cluster_server_key | default('/data/ansible/certs/postgres_server/server.key') }}" \
-    --server-cert "{{ postgresql_cluster_server_cert | default('/data/ansible/certs/postgres_server/server.crt') }}" \
-    --hostname "{{ host_ip }}" \
-    --pgport "{{ postgresql_cluster_port | default('5433') }}"
+- include_tasks: "monitor_init_{{ postgresql_pg_auto_failover_version }}.yml"
   when: (not pg_autoctl_dir.stat.exists) and (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "create systemd config for cluster"

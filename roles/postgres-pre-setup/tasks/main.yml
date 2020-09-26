@@ -7,7 +7,7 @@
     data: "{{ lookup('file', 'postgres12.asc') }}"
     state: present
 
-- name: Add postgres 12 repo itself
+- name: Add postgres repo http://apt.postgresql.org/pub/repos/apt/
   become: yes
   apt_repository: 
     repo: "deb [ arch=amd64 ] http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main"

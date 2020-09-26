@@ -14,8 +14,6 @@
 - include_tasks: register_node.yml
   when: (not pg_autoctl_dir.stat.exists) and (not pgdata_dir_version.stat.exists) and not (postgresql_cluster_is_monitor | default('False') | bool)
 
-
-
 - name: Check if PostgreSQL database is initialized now at target location
   stat:
     path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"

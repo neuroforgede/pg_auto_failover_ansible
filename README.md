@@ -23,6 +23,15 @@ The following roles are based on [geerlingguy's work](https://github.com/geerlin
 - passbolt-cluster-hba-config
 - passbolt-cluster-install
 
+## Upgrading pg_auto_failover (NOT postgres itself)
+
+When upgrading, please follow this procedure:
+
+1. run the `postgres_cluster_servers_upgrade_to_1.4.yml` playbook to upgrade to the version you want to upgrade to
+2. update the inventory to reflect the new pg_auto_failover version
+
+NOTE: starting at 1.4 pg_auto_failover has a new upgrade scheme, it is possible that we will simply have one file, e.g. `postgres_cluster_servers_upgrade_after_1.4.yml`, that would require passing in a version number. We will update this readme once this becomes relevant (current version is 1.4).
+
 ## Testing
 
 Requirements:
