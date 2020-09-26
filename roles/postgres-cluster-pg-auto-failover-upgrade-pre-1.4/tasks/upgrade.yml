@@ -70,10 +70,52 @@
     state: "{{ postgresql_cluster_restarted_state }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "ensure monitor pg_auto_failover service is started"
+- name: "restart monitor pg_auto_failover service once more"
   service:
     name: "{{ postgresql_cluster_daemon }}"
-    state: "started"
+    state: "{{ postgresql_cluster_restarted_state }}"
+  when: (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "wait until the pg_auto_failover postgres extension has been upgraded on the master node"
+  become: true
+  async: "{{ postgresql_cluster_monitor_upgrade_timeout | default(300) | int }}"
+  # poll every 10 seconds to see if we are finished
+  poll: 10
+  shell: |
+    counter=1
+
+    echo "restarting monitor..."
+    #service {{ postgresql_cluster_daemon }} restart 
+    echo "checking pgautofailover extension again..."
+    current_version=$(su postgres -c "psql -p {{ postgresql_cluster_port }} -t -X -A -c \"select extversion from pg_extension where extname='pgautofailover';\" -d pg_auto_failover")
+    echo "current_version: $current_version"
+    
+    until [ "$current_version" == "{{ postgresql_new_pg_auto_failover_version }}" ]
+    do
+      ((counter++))
+      sleep 1
+
+      echo "restarting monitor..."
+      #service {{ postgresql_cluster_daemon }} restart
+      echo "checking pgautofailover extension again..."
+      current_version=$(su postgres -c "psql -p {{ postgresql_cluster_port }} -t -X -A -c \"select extversion from pg_extension where extname='pgautofailover';\" -d pg_auto_failover")
+      echo "current_version: $current_version"
+    done
+
+    echo "pgautofailover was found to be at version {{ postgresql_new_pg_auto_failover_version }} after ${counter} tries."
+  args:
+    executable: /bin/bash
+  when: (postgresql_cluster_is_monitor | default('False') | bool)
+  register: pg_autoctl_monitor_upgrade
+
+- debug:
+    var: pg_autoctl_monitor_upgrade.stdout
+  when: (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "restart monitor pg_auto_failover service after upgrade was successful"
+  service:
+    name: "{{ postgresql_cluster_daemon }}"
+    state: "{{ postgresql_cluster_restarted_state }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "restart pg_auto_failover service on all data nodes"
@@ -82,7 +124,18 @@
     state: "{{ postgresql_cluster_restarted_state }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
-# FIXME: wait for all nodes to be migrated
+- name: "check state on each data node"
+  become_user: "{{ postgresql_cluster_user }}"
+  shell: >
+    PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl show state \
+    --pgdata "{{ postgresql_cluster_data_dir }}" \
+    --json
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  register: pg_autoctl_state
+
+- debug:
+    var: pg_autoctl_state
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "ensure pg_auto_failover service is started on all nodes"
   service:
