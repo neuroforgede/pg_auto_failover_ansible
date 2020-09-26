@@ -168,7 +168,10 @@
     force: yes
   when: computed_postgresql_cluster_pg_hba_entries | length > 0
 
-- include_tasks: "restart_postgres.yml"
+- name: "reload cluster config"
+  become_user: postgres
+  shell: >
+    PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_ctl reload --pgdata {{ postgresql_cluster_data_dir }}
 
 # TODO: move this to a separate role?
 - name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster members"

@@ -5,4 +5,5 @@
   any_errors_fatal: true
   roles:
     - name: postgres-cluster-load-vars
+    # make sure we have the latest hba config
     - role: postgres-cluster-pg-auto-failover-upgrade-pre-1.4

@@ -1,4 +1,7 @@
 ---
+- include_role:
+    name: postgres-cluster-hba-config
+
 - name: "check state on each data node"
   become_user: "{{ postgresql_cluster_user }}"
   shell: >
