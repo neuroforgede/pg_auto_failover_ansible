@@ -30,9 +30,15 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts.yml ../../po
 
 check_setup
 
-# echo "Setup with 1.3 successful, upgrading to 1.4 now..."
+# TODO: check if version is == 1.3
 
-# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts.yml ../../postgres_cluster_servers.yml --extra-vars='{"postgresql_pg_auto_failover_version": "1.4"}'
+echo "Setup with 1.3 successful, upgrading to 1.4 now..."
+
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts.yml ../../postgres_cluster_upgrade_pre_1.4.yml --extra-vars='{"postgresql_new_pg_auto_failover_version": "1.4"}'
+
+check_setup
+
+# TODO: check if version is == 1.4
 
 echo ""
 echo "Finished tests. OK"

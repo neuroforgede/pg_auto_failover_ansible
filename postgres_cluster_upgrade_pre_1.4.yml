@@ -1,0 +1,8 @@
+---
+
+- hosts: postgres_cluster
+  become: true
+  any_errors_fatal: true
+  roles:
+    - name: postgres-cluster-load-vars
+    - role: postgres-cluster-pg-auto-failover-upgrade-pre-1.4

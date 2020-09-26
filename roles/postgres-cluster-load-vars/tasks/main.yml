@@ -19,6 +19,16 @@
     postgresql_pg_auto_failover_version: "{{ __postgresql_pg_auto_failover_version }}"
   when: postgresql_pg_auto_failover_version is not defined
 
+- name: "Define postgresql_cluster_user."
+  set_fact:
+    postgresql_cluster_user: "{{ __postgresql_cluster_user }}"
+  when: postgresql_cluster_user is not defined
+
+- name: "Define postgresql_cluster_restarted_state."
+  set_fact:
+    postgresql_cluster_restarted_state: "{{ __postgresql_cluster_restarted_state }}"
+  when: postgresql_cluster_restarted_state is not defined
+
 - name: "Define postgresql_repository."
   set_fact:
     postgresql_repository: "{{ __postgresql_repository }}"

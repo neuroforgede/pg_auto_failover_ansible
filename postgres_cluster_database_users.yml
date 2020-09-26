@@ -1,6 +1,7 @@
 ---
 
 - hosts: postgres_cluster
+  any_errors_fatal: true
   become: true
   roles:
     - name: postgres-cluster-load-vars
