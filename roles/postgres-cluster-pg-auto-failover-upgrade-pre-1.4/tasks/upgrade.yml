@@ -76,13 +76,15 @@
     state: "started"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "restart monitor pg_auto_failover service on all data nodes"
+- name: "restart pg_auto_failover service on all data nodes"
   service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "ensure monitor pg_auto_failover service is started on all nodes"
+# FIXME: wait for all nodes to be migrated
+
+- name: "ensure pg_auto_failover service is started on all nodes"
   service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
