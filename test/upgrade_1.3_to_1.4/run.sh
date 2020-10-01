@@ -1,8 +1,8 @@
 #!/bin/bash
 
 check_setup() {
-  node_1_check_recovery=`PGPASSWORD=password1 psql -h 10.0.0.11 -p 5433 -t -X -A -c 'select pg_is_in_recovery()' --username testuser -d testdb`
-  node_2_check_recovery=`PGPASSWORD=password1 psql -h 10.0.0.12 -p 5433 -t -X -A -c 'select pg_is_in_recovery()' --username testuser -d testdb`
+  node_1_check_recovery=`PGPASSWORD=password1 psql -h 10.0.0.21 -p 5433 -t -X -A -c 'select pg_is_in_recovery()' --username testuser -d testdb`
+  node_2_check_recovery=`PGPASSWORD=password1 psql -h 10.0.0.22 -p 5433 -t -X -A -c 'select pg_is_in_recovery()' --username testuser -d testdb`
 
   sorted=`echo -e "$node_2_check_recovery\n$node_1_check_recovery" | sort`
 
