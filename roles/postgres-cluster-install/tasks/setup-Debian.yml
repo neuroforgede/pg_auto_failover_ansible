@@ -13,3 +13,10 @@
   locale_gen: "name={{ item }} state=present"
   with_items: "{{ postgresql_cluster_locales }}"
   register: locale_gen_result
+
+- name: "pin postgres packages"
+  template:
+    src: "pgdg.preferences.j2"
+    dest: "/etc/apt/preferences.d/pgdg"
+    owner: root
+    group: root
