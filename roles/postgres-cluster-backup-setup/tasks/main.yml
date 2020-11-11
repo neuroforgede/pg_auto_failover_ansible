@@ -33,6 +33,12 @@
     mode: 0700
     
 - name: Create cronjob for postgres dump
+  when: "not (postgres_backup_enabled | default(False) | bool)"
+  cron:
+    name: "start automatic postgres dump"
+    state: absent
+    
+- name: Create cronjob for postgres dump
   when: "postgres_backup_enabled | default(False) | bool"
   cron:
     name: "start automatic postgres dump"
