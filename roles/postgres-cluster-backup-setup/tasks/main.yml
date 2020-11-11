@@ -36,6 +36,7 @@
   when: "not (postgres_backup_enabled | default(False) | bool)"
   cron:
     name: "start automatic postgres dump"
+    user: "root"
     state: absent
     
 - name: Create cronjob for postgres dump
