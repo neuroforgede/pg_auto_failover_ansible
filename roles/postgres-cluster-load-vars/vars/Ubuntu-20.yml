@@ -14,4 +14,6 @@ __postgresql_cluster_packages:
   - "postgresql-{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}"
   - "postgresql-contrib-{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}"
   - libpq-dev
-postgresql_cluster_python_pip_library: psycopg2
+postgresql_cluster_python_pip_library:
+  - setuptools
+  - psycopg2

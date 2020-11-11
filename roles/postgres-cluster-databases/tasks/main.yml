@@ -1,9 +1,4 @@
 ---
-- name: Install psycopg2
-  pip:
-    name: psycopg2
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
-
 - name: "check if server is standby (pg_is_in_recovery)"
   shell: 
     psql -p "{{ postgresql_cluster_port }}" -t -X -A -c 'select pg_is_in_recovery()'

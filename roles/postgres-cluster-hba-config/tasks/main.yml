@@ -1,10 +1,4 @@
 ---
-
-- name: Install psycopg2
-  pip:
-    name: psycopg2
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
-
 - name: "initialize computed_postgresql_cluster_pg_hba_entries"
   set_fact:
     computed_postgresql_cluster_pg_hba_entries: []
