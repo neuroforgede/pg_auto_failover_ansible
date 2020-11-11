@@ -10,6 +10,13 @@
   apt:
     name: "{{ postgresql_cluster_python_library }}"
     state: present
+  when: postgresql_cluster_python_library is defined
+
+- name: Ensure PostgreSQL Python libraries are installed via pip
+  pip:
+    name: "{{ postgresql_cluster_python_pip_library }}"
+    state: present
+  when: postgresql_cluster_python_pip_library is defined
 
 - name: Ensure PostgreSQL packages are installed.
   apt:
