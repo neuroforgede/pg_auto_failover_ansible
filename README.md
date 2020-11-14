@@ -1,5 +1,5 @@
 # pg_auto_failover_ansible
-Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu 18.04 cluster with [pg_auto_failover](https://github.com/citusdata/pg_auto_failover) 1.4 and PostgreSQL 12.
+Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu 18.04 cluster with [pg_auto_failover](https://github.com/citusdata/pg_auto_failover) 1.3/1.4 and PostgreSQL 12.
 
 ## Current features
 
