@@ -8,6 +8,10 @@
     # pg_dump apparently wants to cd back to the directory
     mode: 0711
 
+- stat:
+    path: /data/ansible/pg_dumps
+  register: pg_dumps_link
+
 - name: "ensure /data/ansible/pg_dumps exists"
   file:
     path: /data/ansible/pg_dumps
@@ -15,6 +19,7 @@
     owner: "postgres"
     group: "postgres"
     mode: 0700
+    when: not (pg_dumps_link.stat.islnk is defined and pg_dumps_link.stat.islnk)
 
 - name: copy dump_all.sh script
   template:
