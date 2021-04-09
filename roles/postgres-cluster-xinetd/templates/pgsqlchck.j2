@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# some parts of this are based on code from https://github.com/rglaue/xinetd_bash_http_service/blob/master/xinetdhttpservice.sh
+#
+# This script checks if a postgres server is healthy running on localhost. It will return:
+# "HTTP/1.x 200 OK\r" (if postgres is running smoothly)
+# - OR -
+# "HTTP/1.x 503 Service Unavailable\r" (else)
+
+{% raw %}
+OPT_HTTP_STATUS=1
+#
+# The HTTP response. This will return a HTTP response with the provided HTTP
+#   code and a descriptive message.
+# Example:
+#   http_response 301 "You accessed something that does not exist"
+#   http_response 200 '{ "status": "success" }'
+#
+http_response () {
+    HTTP_CODE=$1
+    MESSAGE=${2:-Message Undefined}
+    length=${#MESSAGE}
+  if [ "$OPT_HTTP_STATUS" -eq 1 ]; then
+    if [ "$HTTP_CODE" -eq 503 ]; then
+      echo -en "HTTP/1.1 503 Service Unavailable\r\n" 
+    elif [ "$HTTP_CODE" -eq 301 ]; then
+      echo -en "HTTP/1.1 301 Not Found\r\n" 
+    elif [ "$HTTP_CODE" -eq 200 ]; then
+      echo -en "HTTP/1.1 200 OK\r\n" 
+    elif [ "$HTTP_CODE" -eq 206 ]; then
+      echo -en "HTTP/1.1 206 Partial Content\r\n" 
+    else
+      echo -en "HTTP/1.1 ${HTTP_CODE} UNKNOWN\r\n" 
+    fi
+    echo -en "Content-Type: text/plain\r\n" 
+    echo -en "Connection: close\r\n" 
+    echo -en "Content-Length: ${length}\r\n" 
+    echo -en "\r\n" 
+    echo -en "$MESSAGE"
+    echo -en "\r\n" 
+    sleep 0.1
+    exit 0
+  fi
+}
+{% endraw %}
+
+VALUE=`psql -t -p 5433 -c "select pg_is_in_recovery()" -X -A -U {{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }} -d template1 2> /dev/null`
+# Check the output. If it is not empty then everything is fine and we return something. Else, we just do not return anything.
+ 
+ 
+if [ "$VALUE" == "t" ]
+then
+    http_response 206 "Standby"
+elif [ "$VALUE" == "f" ]
+then
+    http_response 200 "Primary"
+else
+    http_response 503 "DB Down"
+fi

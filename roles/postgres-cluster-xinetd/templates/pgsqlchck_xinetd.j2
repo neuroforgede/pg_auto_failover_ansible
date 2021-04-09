@@ -1,0 +1,13 @@
+service pgsqlchk
+{
+        flags           = REUSE
+        socket_type     = stream
+        port            = {{ postgresql_cluster_xinetd_port | default('23267') }}
+        wait            = no
+        user            = {{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}
+        server          = /opt/pgsqlchk
+        log_on_failure  += USERID
+        disable         = no
+        only_from       = 0.0.0.0/0
+        per_source      = UNLIMITED
+}

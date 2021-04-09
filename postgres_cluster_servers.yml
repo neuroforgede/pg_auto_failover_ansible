@@ -4,17 +4,23 @@
   become: true
   vars:
     setup_additional_groups:
-      - name: "postgres"
+      - name: "{{ postgresql_cluster_group | default('postgres') }}"
+        requires_root_password: True
+      - name: "{{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }}"
         requires_root_password: True
     setup_additional_users:
-      - name: "postgres"
-        group: "postgres"
+      - name: "{{ postgresql_cluster_user | default('postgres') }}"
+        group: "{{ postgresql_cluster_group | default('postgres') }}"
+        system: True
+        is_sudo: False
+      - name: "{{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}"
+        group: "{{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }}"
         system: True
         is_sudo: False
     ssl_cert_dirs:
       - directory: "postgres_server"
-        owner: "postgres"
-        group: "postgres"
+        owner: "{{ postgresql_cluster_user | default('postgres') }}"
+        group: "{{ postgresql_cluster_group | default('postgres') }}"
   roles:
     - role: user-setup
     - role: force-reconnect
@@ -43,6 +49,7 @@
     # one by one add all new data nodes
     - role: postgres-cluster-data-initialize-new
 
+# final setup run, configure databases, hba-config, xinetd
 - hosts: postgres_cluster
   any_errors_fatal: true
   become: true
@@ -52,3 +59,4 @@
     - role: postgres-cluster-databases
     # not really needed as this is already done during setup, but does not hurt
     - role: postgres-cluster-hba-config
+    - role: postgres-cluster-xinetd

@@ -3,6 +3,7 @@
   set_fact:
     computed_postgresql_cluster_pg_hba_entries: []
 
+# TODO: this might be suboptimal if run on a secondary. we have not run into any issues so far though.
 - name: Ensure PostgreSQL pgautofailover_monitor user is present.
   postgresql_user:
     name: "pgautofailover_monitor"
