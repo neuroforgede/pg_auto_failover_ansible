@@ -3,6 +3,21 @@
 - hosts: postgres_cluster
   any_errors_fatal: true
   become: true
+  vars:
+    setup_additional_groups:
+      - name: "{{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }}"
+        requires_root_password: True
+    setup_additional_users:
+      - name: "{{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}"
+        group: "{{ postgresql_cluster_xinetd_group | default('postgres_xinetd') }}"
+        system: True
+        is_sudo: False
+  roles:
+    - role: user-setup
+
+- hosts: postgres_cluster
+  any_errors_fatal: true
+  become: true
   roles:
     - name: postgres-cluster-load-vars
     - role: postgres-cluster-hba-config
