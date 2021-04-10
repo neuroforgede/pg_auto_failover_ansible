@@ -22,7 +22,6 @@
     ansible_ssh_pipelining: true
 
 - name: Ensure that the xinetd packages are installed
-  tags: xinetd
   become: true
   package:
     name: "xinetd"
@@ -53,7 +52,7 @@
     dest: /etc/xinetd.d/pgsqlchk
     owner: "root"
     group: "root"
-    mode: 0755
+    mode: 0644
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "add pgsqlchck line to /etc/services"

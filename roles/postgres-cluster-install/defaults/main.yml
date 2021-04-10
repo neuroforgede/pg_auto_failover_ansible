@@ -6,16 +6,6 @@ postgresql_cluster_user: postgres
 postgresql_cluster_unix_socket_directories:
   - /var/run/postgresql
 
-# Host based authentication (hba) entries to be added to the pg_hba.conf. This
-# variable's defaults reflect the defaults that come with a fresh installation.
-_postgresql_cluster_minimum_hba_entries:
-  - {type: local, database: all, user: postgres, auth_method: peer}
-  - {type: local, database: replication, user: postgres, auth_method: peer }
-  - {type: local, database: all, user: "{{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}", auth_method: peer}
-  - {type: local, database: all, user: all, auth_method: peer}
-  - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: md5}
-  - {type: host, database: all, user: all, address: '::1/128', auth_method: md5}
-
 # Debian only. Used to generate the locales used by PostgreSQL databases.
 postgresql_cluster_locales:
   - 'en_US.UTF-8'

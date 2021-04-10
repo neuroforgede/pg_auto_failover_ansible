@@ -1,0 +1,4 @@
+"{{ postgresql_cluster_pg_bouncer_root_user | default('pgbounceradmin') }}" "{{ postgresql_cluster_pg_bouncer_root_password_hashed | default('md5' + ((postgresql_cluster_pg_bouncer_root_password + (postgresql_cluster_pg_bouncer_root_user | default('pgbounceradmin'))) | hash('md5'))) }}"
+{% for user in postgresql_cluster_users | default([]) %}
+"{{ user.name }}" "{{ user.hashed_password | default('md5' + ((user.password + user.name) | hash('md5'))) }}"
+{% endfor %}

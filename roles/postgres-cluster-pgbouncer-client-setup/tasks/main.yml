@@ -1,0 +1,28 @@
+---
+
+- name: Template userlist.txt into /etc/pgbouncer/userlist.txt
+  template:
+    src: userlist.txt.j2
+    dest: /etc/pgbouncer/userlist.txt
+    owner: "{{ postgresql_cluster_user | default('postgres') }}"
+    group: "{{ postgresql_cluster_group | default('postgres') }}"
+    mode: 0600
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "Allow incoming access to the pgbouncer port {{ postgresql_cluster_pg_bouncer_listen_port | default('6432') }} for all cluster clients"
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item.ip }}/32"
+    to_port: "{{ postgresql_cluster_pg_bouncer_listen_port | default('6432') }}"
+    comment: "pgbouncer {{ postgresql_cluster_name }} - client: {{ item.name }}"
+  with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "reload pgbouncer"
+  become: true
+  service:
+    name: "pgbouncer"
+    state: "reloaded"
+    enabled: yes
+  when: not (postgresql_cluster_is_monitor | default('False') | bool)

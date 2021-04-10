@@ -59,4 +59,7 @@
     - role: postgres-cluster-databases
     # not really needed as this is already done during setup, but does not hurt
     - role: postgres-cluster-hba-config
+    # setup relevant extra services running on the db servers, namely pgbouncer and xinetd for healtchecks
+    - role: postgres-cluster-pgbouncer-setup
+    - role: postgres-cluster-pgbouncer-client-setup
     - role: postgres-cluster-xinetd
