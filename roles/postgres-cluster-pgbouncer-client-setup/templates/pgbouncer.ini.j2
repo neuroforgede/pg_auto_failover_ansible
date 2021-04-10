@@ -75,7 +75,7 @@ unix_socket_dir = {{ postgresql_cluster_pg_bouncer_unix_socket_dir | default('/v
 
 ;; disable, allow, require, verify-ca, verify-full
 ;; by default we are aggressive and require the client to have a valid ca
-client_tls_sslmode = {{ postgresql_cluster_pg_bouncer_client_tls_sslmode| default('verify-ca') }}
+client_tls_sslmode = {{ postgresql_cluster_pg_bouncer_client_tls_sslmode | default('verify-ca') }}
 
 ;; we simply use the settings from the cluster itself, we are running under the same user anyways
 ;; Path to file that contains trusted CA certs
@@ -225,7 +225,7 @@ max_user_connections = {{ postgresql_cluster_pg_bouncer_max_user_connections | d
 ;; Syslog settings
 syslog = {{ postgresql_cluster_pg_bouncer_syslog | default('0') }}
 syslog_facility = {{ postgresql_cluster_pg_bouncer_syslog_facility | default('daemon') }}
-syslog_ident = {{ postgresql_cluster_pg_bouncer_syslog_syslog_ident | default('pgbouncer') }}
+syslog_ident = {{ postgresql_cluster_pg_bouncer_syslog_ident | default('pgbouncer') }}
 
 ;; log if client connects or server connection is made
 ;log_connections = 1
