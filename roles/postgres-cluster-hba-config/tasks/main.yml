@@ -5,6 +5,8 @@
 
 # TODO: this might be suboptimal if run on a secondary. we have not run into any issues so far though.
 - name: Ensure PostgreSQL pgautofailover_monitor user is present.
+  retries: 5
+  delay: 3
   postgresql_user:
     name: "pgautofailover_monitor"
     login_host: "localhost"
@@ -12,10 +14,12 @@
     login_unix_socket: "{{ postgresql_cluster_unix_socket_directories[0] }}"
     port: "{{ postgresql_cluster_port }}"
     state: "present"
-  no_log: "{{ postgres_users_no_log }}"
+  no_log: false #"{{ postgres_users_no_log }}"
   become: true
+  register: pgautofailover_monitor_user_creation
   become_user: "{{ postgresql_cluster_user }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
+  until: pgautofailover_monitor_user_creation is not failed
   # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
   vars:
     ansible_ssh_pipelining: true
