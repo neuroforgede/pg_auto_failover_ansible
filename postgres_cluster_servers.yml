@@ -61,5 +61,7 @@
     - role: postgres-cluster-hba-config
     # setup relevant extra services running on the db servers, namely pgbouncer and xinetd for healtchecks
     - role: postgres-cluster-pgbouncer-setup
+      when: postgresql_cluster_pg_bouncer_include | default('False') | bool
     - role: postgres-cluster-pgbouncer-client-setup
+      when: postgresql_cluster_pg_bouncer_include | default('False') | bool
     - role: postgres-cluster-xinetd
