@@ -24,6 +24,35 @@
   vars:
     ansible_ssh_pipelining: true
 
+
+- name: "add postgres user to pg_hba entries for each cluster member for postgres database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "postgres"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "postgres"
+      auth_method: cert
+      auth_options: "map=postgres_node_remote"      
+  set_fact:
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+
+- name: "add postgres user to pg_hba entries for each cluster member for template1 database"
+  vars:
+    new_entry:
+      type: hostssl
+      database: "template1"
+      address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
+      user: "postgres"
+      auth_method: cert
+      auth_options: "map=postgres_node_remote"      
+  set_fact:
+    computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
+  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+
+
 - name: "add autoctl_node user to pg_hba entries for each monitor node"
   vars:
     new_entry:
@@ -92,7 +121,7 @@
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 
-- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+- name: "add pgautofailover_replicator user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
     new_entry:
       type: hostssl
@@ -106,7 +135,7 @@
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
 
-- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+- name: "add pgautofailover_replicator user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
     new_entry:
       type: hostssl
@@ -119,7 +148,7 @@
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   with_items: "{{ groups['postgres_cluster'] | default([]) }}"
 
-- name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
+- name: "add pgautofailover_monitor user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
     new_entry:
       type: hostssl
