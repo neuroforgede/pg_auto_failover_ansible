@@ -22,6 +22,7 @@
 # MAPNAME       SYSTEM-USERNAME         PG-USERNAME
 autoctl_node_peer  postgres             autoctl_node
 {% for item in groups['postgres_cluster'] %}
+postgres_node_remote {{ hostvars[item]['host_ssl_cn'] | default(hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host'])) }} postgres
 autoctl_node_remote {{ hostvars[item]['host_ssl_cn'] | default(hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host'])) }} autoctl_node
 pgautofailover_replicator_remote {{ hostvars[item]['host_ssl_cn'] | default(hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host'])) }} pgautofailover_replicator
 pgautofailover_monitor_remote {{ hostvars[item]['host_ssl_cn'] | default(hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host'])) }} pgautofailover_monitor
