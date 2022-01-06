@@ -50,10 +50,10 @@ VALUE=`psql -t -p 5433 -c "select pg_is_in_recovery()" -X -A -U {{ postgresql_cl
  
 if [ "$VALUE" == "t" ]
 then
-    http_response 206 "Standby"
+    http_response {{ postgresql_cluster_xinetd_standby_http_code | default('206') }} "{{ postgresql_cluster_xinetd_down_http_response | default('Standby') }}"
 elif [ "$VALUE" == "f" ]
 then
-    http_response 200 "Primary"
+    http_response {{ postgresql_cluster_xinetd_primary_http_code | default('200') }} "{{ postgresql_cluster_xinetd_down_http_response | default('Primary') }}"
 else
-    http_response 503 "DB Down"
+    http_response {{ postgresql_cluster_xinetd_down_http_code | default('503') }} "{{ postgresql_cluster_xinetd_down_http_response | default('DB Down') }}"
 fi
