@@ -6,6 +6,7 @@ Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu 
 - Automatically setup a secure cluster with 1 monitor node and 2 database nodes with synchronous replication
 - Support for Ubuntu 18.04 (Ubuntu 20.04 should work as well, but not part of the test suite yet)
 - Support for PostgreSQL 12/13 (Postgres 14 should work as well, but not part of the test suite yet)
+- Support for rudimentary pgbouncer setup (not enabled by default)
 
 ## Not features
 
