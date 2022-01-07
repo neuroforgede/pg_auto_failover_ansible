@@ -14,6 +14,7 @@ Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu 
 - NO automatic configuration of backups - Replication does NOT replace regular backups!
 - By default this playbook leaves the default clusters that might
 be present on your machines after installation and uses a different port than the default (`5433` - this is configurable)
+- HAProxy setup is out of scope of this project as it is common to run HAProxy on the application servers themselves. A sample config can be found in the [wiki](https://github.com/neuroforgede/pg_auto_failover_ansible/wiki/HAProxy)
 
 ## Used Software
 
