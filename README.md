@@ -16,6 +16,11 @@ Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu 
 - By default this playbook leaves the default clusters that might be present on your machines after installation and uses a different port than the default (`5433` - this is configurable)
 - HAProxy setup is out of scope of this project as it is common to run HAProxy on the application servers themselves. A sample config can be found in the [wiki](https://github.com/neuroforgede/pg_auto_failover_ansible/wiki/HAProxy)
 
+## Configuration
+
+While we do not have a full tutorial on all configuration options a good place to start is in the [test directory](./test). There you can also find Vagrant based tests to take
+the playbooks for a spin.
+
 ## Used Software
 
 The following roles are based on [geerlingguy's work](https://github.com/geerlingguy/ansible-role-postgresql) but heavily modified to work with pg_auto_failover
