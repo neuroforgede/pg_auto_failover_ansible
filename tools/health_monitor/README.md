@@ -31,3 +31,27 @@ Then run the docker container as such:
 ```
 docker run -v $(pwd)/config.py:/monitor/config.py:ro -p 8080:8080 --rm neuroforgede/pg_auto_failover_health_monitor:0.1
 ```
+
+Then you will be able to check health like this:
+
+```
+curl --fail http://localhost:8080/api/v1/pg/health
+```
+
+If everything is fine (HTTP status = 200) like this:
+
+```
+{"monitor":true,"node01":true,"node02":true}
+```
+
+If the service is unavailable you will get this output:
+
+```
+curl: (22) The requested URL returned error: 503 SERVICE UNAVAILABLE
+```
+
+If you leave out `--fail` you get an output like this on a failure:
+
+```
+{"monitor":false,"node01":true,"node02":true}
+```
