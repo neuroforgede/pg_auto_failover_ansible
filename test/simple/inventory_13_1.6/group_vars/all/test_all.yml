@@ -42,6 +42,10 @@ postgresql_monitor_users:
 postgresql_cluster_allowed_clients:
   - name: "vagrant host"
     ip: "10.0.0.1"
+
+postgresql_monitor_allowed_clients:
+  - name: "vagrant host (but on monitor)"
+    ip: "10.0.0.1"
   
 
 postgresql_cluster_users:

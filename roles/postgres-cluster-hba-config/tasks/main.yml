@@ -220,3 +220,13 @@
     comment: "Client {{ postgresql_cluster_name }} - client: {{ item.name }}"
   with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster clients"
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item.ip }}/32"
+    to_port: "{{ postgresql_cluster_port | default('5433') }}"
+    comment: "Client {{ postgresql_cluster_name }} - client: {{ item.name }}"
+  with_items: "{{ postgresql_monitor_allowed_clients | default([]) }}"
+  when: (postgresql_cluster_is_monitor | default('False') | bool)
