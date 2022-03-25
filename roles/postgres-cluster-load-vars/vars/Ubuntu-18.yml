@@ -4,7 +4,7 @@ __postgresql_cluster_user: postgres
 __postgresql_cluster_name: "main_cluster"
 __postgresql_cluster_port: "5433"
 __postgresql_cluster_version: "12"
-__postgresql_pg_auto_failover_version: "1.4"
+__postgresql_pg_auto_failover_version: "1.6"
 __postgresql_repository: "deb [ arch=amd64 ] http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main"
 __postgresql_cluster_data_dir: "/var/lib/postgresql/{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}/{{ postgresql_cluster_name | default(__postgresql_cluster_name) }}"
 __postgresql_cluster_bin_path: "/usr/lib/postgresql/{{ postgresql_cluster_version | default(__postgresql_cluster_version) }}/bin"

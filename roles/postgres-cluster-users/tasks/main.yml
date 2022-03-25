@@ -27,3 +27,27 @@
   # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
   vars:
     ansible_ssh_pipelining: true
+
+
+- name: Ensure PostgreSQL cluster monitor users are present.
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | default(omit) }}"
+    encrypted: "{{ item.encrypted | default(omit) }}"
+    priv: "{{ item.priv | default(omit) }}"
+    role_attr_flags: "{{ item.role_attr_flags | default(omit) }}"
+    db: "{{ item.db | default(omit) }}"
+    login_host: "{{ item.login_host | default('localhost') }}"
+    login_password: "{{ item.login_password | default(omit) }}"
+    login_user: "{{ item.login_user | default(postgresql_cluster_user) }}"
+    login_unix_socket: "{{ item.login_unix_socket | default(postgresql_cluster_unix_socket_directories[0]) }}"
+    port: "{{ item.port | default(postgresql_cluster_port) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ postgresql_monitor_users | default([]) }}"
+  no_log: "{{ postgres_users_no_log }}"
+  become: true
+  become_user: "{{ postgresql_cluster_user }}"
+  when: (postgresql_cluster_is_monitor | default('False') | bool) and pg_is_in_recovery.stdout_lines[0] == 'f'
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true

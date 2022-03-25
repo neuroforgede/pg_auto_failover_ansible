@@ -26,8 +26,8 @@ else
   exit 1
 fi
 
-node_1_pgbouncer_test=`PGPASSWORD=password1 psql "port=6432 user=testuser dbname=testdb host=10.0.0.11 sslmode=require" -t -X -A -c 'select 1'`
-node_2_pgbouncer_test=`PGPASSWORD=password1 psql "port=6432 user=testuser dbname=testdb host=10.0.0.12 sslmode=require" -t -X -A -c 'select 1'`
+node_1_pgbouncer_test=`PGPASSWORD=password1 psql "port=6432 user=testuser dbname=testdb host=10.0.0.11 sslmode=allow" -t -X -A -c 'select 1'`
+node_2_pgbouncer_test=`PGPASSWORD=password1 psql "port=6432 user=testuser dbname=testdb host=10.0.0.12 sslmode=allow" -t -X -A -c 'select 1'`
 
 if [ "$node_1_pgbouncer_test" == "1" ]; then
   echo "Could authenticate against pgbouncer for node1. OK"
