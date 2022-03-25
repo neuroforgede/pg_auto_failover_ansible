@@ -1,0 +1,1 @@
+FLASK_APP=monitor python3 -m flask run
