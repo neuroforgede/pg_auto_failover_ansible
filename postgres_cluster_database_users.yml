@@ -6,6 +6,7 @@
   roles:
     - name: postgres-cluster-load-vars
     - role: postgres-cluster-users
+    - role: postgres-cluster-groups
     - role: postgres-cluster-databases
     - role: postgres-cluster-hba-config
     - role: postgres-cluster-pgbouncer-client-setup
