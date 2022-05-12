@@ -20,10 +20,27 @@
     - ufw
     - sudo
     - python-setuptools
-    - python-pip
     - python-passlib
     - acl
-    
+
+- name: Install essential packages
+  apt:
+    name: "{{ packages }}"
+    update_cache: "{{ apt_update_cache | default('True') }}"
+  vars:
+    packages:
+    - python-pip
+  when: ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('20.04', '<')
+
+- name: Install essential packages
+  apt:
+    name: "{{ packages }}"
+    update_cache: "{{ apt_update_cache | default('True') }}"
+  vars:
+    packages:
+    - python3-pip
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('20.04', '>=')
+
 - name: configure and enable ufw
   remote_user: root
   become: true
