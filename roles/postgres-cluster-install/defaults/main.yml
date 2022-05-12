@@ -1,6 +1,6 @@
 ---
 
-postgresql_cluster_python_library: python-psycopg2
+postgresql_cluster_python_library: "{{ __postgresql_cluster_python_library }}"
 postgresql_cluster_user: postgres
 
 postgresql_cluster_unix_socket_directories:
