@@ -13,7 +13,7 @@
   ufw:
     rule: allow
     direction: in
-    src: "{{ item.ip }}/32"
+    src: "{{ item.ip }}/{{ item.subnet_mask | default('32') }}"
     to_port: "{{ postgresql_cluster_pg_bouncer_listen_port | default('6432') }}"
     comment: "pgbouncer {{ postgresql_cluster_name }} - client: {{ item.name }}"
   with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
