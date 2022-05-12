@@ -73,7 +73,7 @@
   ufw:
     rule: allow
     direction: in
-    src: "{{ item.ip }}/32"
+    src: "{{ item.ip }}/{{ item.subnet_mask | default('32') }}"
     to_port: "{{ postgresql_cluster_xinetd_port | default('23267') }}"
     comment: "pgsqlchk xinetd {{ postgresql_cluster_name }} - client: {{ item.name }}"
   with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
