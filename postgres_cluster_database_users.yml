@@ -10,3 +10,4 @@
     - role: postgres-cluster-databases
     - role: postgres-cluster-hba-config
     - role: postgres-cluster-pgbouncer-client-setup
+      when: postgresql_cluster_pg_bouncer_include | default('False') | bool
