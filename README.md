@@ -1,3 +1,5 @@
+Proudly made by [NeuroForge](https://neuroforge.de/) in Bayreuth, Germany.
+
 # pg_auto_failover_ansible
 Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu cluster with [pg_auto_failover](https://github.com/citusdata/pg_auto_failover).
 
