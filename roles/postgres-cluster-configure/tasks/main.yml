@@ -1,4 +1,5 @@
 ---
-- include_tasks: configure.yml
+- ansible.builtin.include_tasks:
+    file: configure.yml
 
 # TODO: smart deletion of default cluster, we dont need it

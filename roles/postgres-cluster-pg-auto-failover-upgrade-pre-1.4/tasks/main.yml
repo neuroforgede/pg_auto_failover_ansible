@@ -1,20 +1,21 @@
 ---
 
 - name: "fail if version is not supported by this upgrade script"
-  fail: 
+  ansible.builtin.fail: 
     msg: "upgrading from version {{ postgresql_pg_auto_failover_version }} is not supported. Are you sure you called the right playbook?"
   when: postgresql_pg_auto_failover_version >= "1.4"
 
 - name: Check if service is already set up
-  stat:
+  ansible.builtin.stat:
     path: "/etc/systemd/system/{{ postgresql_cluster_daemon }}.service"
   register: postgresql_cluster_daemon_service_file
 
 - name: "fail if monitor does not have a service setup already"
-  fail:
+  ansible.builtin.fail:
     msg: "monitor is not properly set up, aborting..."
   when: not postgresql_cluster_daemon_service_file.stat.exists and (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "upgrade (only if service exists already)"
-  include_tasks: "upgrade.yml"
+  ansible.builtin.include_tasks:
+    file: upgrade.yml
   when: postgresql_cluster_daemon_service_file.stat.exists

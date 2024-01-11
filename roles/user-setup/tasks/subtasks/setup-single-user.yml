@@ -13,17 +13,17 @@
   become: yes
   remote_user: root
   block:
-    - name: "create user {{ user.name }}"
-      user:
-        name: "{{ user.name }}"
+    - name: "create user {{ item.name }}"
+      ansible.builtin.user:
+        name: "{{ item.name }}"
         append: yes
         shell: /bin/bash
         create_home: yes
-        system: "{{ user.system | default('False') | bool }}"
+        system: "{{ item.system | default('False') | bool }}"
 
-    - name: "set up bashrc for user {{ user.name }}"
-      copy:
+    - name: "set up bashrc for user {{ item.name }}"
+      ansible.builtin.copy:
         src: .bashrc
-        dest: "/home/{{ user.name }}/.bashrc"
-        owner: "{{ user.name }}"
-        group: "{{ user.group }}"
+        dest: "/home/{{ item.name }}/.bashrc"
+        owner: "{{ item.name }}"
+        group: "{{ item.group }}"

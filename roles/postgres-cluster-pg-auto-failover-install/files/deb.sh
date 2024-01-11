@@ -189,6 +189,9 @@ detect_codename ()
       bullseye)
         codename="${dist}"
         ;;
+      jammy)
+        codename="${dist}"
+        ;;
       *)
         unknown_os
         ;;

@@ -127,7 +127,7 @@ client_tls_protocols = {{ postgresql_cluster_pg_bouncer_client_tls_protocols | d
 ;;;
 
 ;; any, trust, plain, md5, cert, hba, pam
-auth_type = {{ postgresql_cluster_pg_bouncer_auth_type | default('md5') }}
+auth_type = {{ postgresql_cluster_pg_bouncer_auth_type | default('scram-sha-256') }}
 auth_file = /etc/pgbouncer/userlist.txt
 
 ;; Path to HBA-style auth config

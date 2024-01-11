@@ -2,7 +2,7 @@
 
 - name: Ensure that the pgbouncer packages are installed
   become: true
-  apt:
+  ansible.builtin.apt:
     name: "pgbouncer"
     state: present
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
@@ -10,14 +10,14 @@
 - name: Ensure that pgbouncer is started and enabled on boot
   tags: pgbouncer
   become: true
-  service:
+  ansible.builtin.service:
     name: "pgbouncer"
     state: started
     enabled: yes
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: Template pgbouncer.ini into /etc/pgbouncer/pgbouncer.ini
-  template:
+  ansible.builtin.template:
     src: pgbouncer.ini.j2
     dest: /etc/pgbouncer/pgbouncer.ini
     owner: "{{ postgresql_cluster_user | default('postgres') }}"
@@ -27,7 +27,7 @@
 
 - name: "restart pgbouncer"
   become: true
-  service:
+  ansible.builtin.service:
     name: "pgbouncer"
     state: "restarted"
     enabled: yes

@@ -1,13 +1,13 @@
 ---
 - name: "initialize computed_postgresql_cluster_pg_hba_entries"
-  set_fact:
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: []
 
 # TODO: this might be suboptimal if run on a secondary. we have not run into any issues so far though.
 - name: Ensure PostgreSQL pgautofailover_monitor user is present.
   retries: 5
   delay: 3
-  postgresql_user:
+  community.postgresql.postgresql_user:
     name: "pgautofailover_monitor"
     login_host: "localhost"
     login_user: "{{ postgresql_cluster_user }}"
@@ -33,11 +33,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "postgres"
       auth_method: cert
-      auth_options: "map=postgres_node_remote"      
-  set_fact:
+      auth_options: "map=postgres_node_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
-
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add postgres user to pg_hba entries for each cluster member for template1 database"
   vars:
@@ -47,11 +46,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "postgres"
       auth_method: cert
-      auth_options: "map=postgres_node_remote"      
-  set_fact:
+      auth_options: "map=postgres_node_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
-
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add autoctl_node user to pg_hba entries for each monitor node"
   vars:
@@ -61,10 +59,9 @@
       user: "autoctl_node"
       auth_method: peer
       auth_options: "map=autoctl_node_peer"
-  set_fact:
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   when: postgresql_cluster_is_monitor | default('False') | bool
-
 
 - name: "add autoctl_node user to pg_hba entries for each monitor node"
   vars:
@@ -74,10 +71,9 @@
       user: "autoctl_node"
       auth_method: peer
       auth_options: "map=autoctl_node_peer"
-  set_fact:
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
   when: postgresql_cluster_is_monitor | default('False') | bool
-
 
 - name: "add autoctl_node user to pg_hba entries for each cluster member for autoctl_node database"
   vars:
@@ -87,11 +83,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "autoctl_node"
       auth_method: cert
-      auth_options: "map=autoctl_node_remote"      
-  set_fact:
+      auth_options: "map=autoctl_node_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
-
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add autoctl_node user to pg_hba entries for each cluster member for template1 database"
   vars:
@@ -101,11 +96,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "autoctl_node"
       auth_method: cert
-      auth_options: "map=autoctl_node_remote"      
-  set_fact:
+      auth_options: "map=autoctl_node_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
-
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add autoctl_node user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
@@ -115,11 +109,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "autoctl_node"
       auth_method: cert
-      auth_options: "map=autoctl_node_remote"      
-  set_fact:
+      auth_options: "map=autoctl_node_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
-
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add pgautofailover_replicator user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
@@ -129,11 +122,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "pgautofailover_replicator"
       auth_method: cert
-      auth_options: "map=pgautofailover_replicator_remote"      
-  set_fact:
+      auth_options: "map=pgautofailover_replicator_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
-
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add pgautofailover_replicator user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
@@ -143,10 +135,10 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "pgautofailover_replicator"
       auth_method: cert
-      auth_options: "map=pgautofailover_replicator_remote"      
-  set_fact:
+      auth_options: "map=pgautofailover_replicator_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add pgautofailover_monitor user to pg_hba entries for each cluster member for pg_auto_failover database"
   vars:
@@ -156,27 +148,27 @@
       address: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
       user: "pgautofailover_monitor"
       auth_method: cert
-      auth_options: "map=pgautofailover_monitor_remote"      
-  set_fact:
+      auth_options: "map=pgautofailover_monitor_remote"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + [new_entry] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "add default hba_entries to the end of computed_postgresql_cluster_pg_hba_entries"
-  set_fact:
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + (_postgresql_cluster_minimum_hba_entries | default([])) }}"
 
-- name: "add non system pg_hba entries for all data cluster members to pg_hba.conf"     
-  set_fact:
+- name: "add non system pg_hba entries for all data cluster members to pg_hba.conf"
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + (postgresql_cluster_hba_entries | default([])) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "add non system pg_hba entries for monitor to the end of computed_postgresql_cluster_pg_hba_entries"
-  set_fact:
+  ansible.builtin.set_fact:
     computed_postgresql_cluster_pg_hba_entries: "{{ computed_postgresql_cluster_pg_hba_entries + (postgresql_monitor_hba_entries | default([])) }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "Configure pg_ident mapping for all cluster members and monitors"
-  template:
+  ansible.builtin.template:
     src: "pg_ident.conf.j2"
     dest: "{{ postgresql_cluster_config_path }}/pg_ident.conf"
     owner: "{{ postgresql_cluster_user }}"
@@ -186,7 +178,7 @@
     force: yes
 
 - name: "Configure host based authentication for all cluster members and monitors"
-  template:
+  ansible.builtin.template:
     src: "pg_hba.conf.j2"
     dest: "{{ postgresql_cluster_config_path }}/pg_hba.conf"
     owner: "{{ postgresql_cluster_user }}"
@@ -198,35 +190,38 @@
 
 - name: "reload cluster config"
   become_user: postgres
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_ctl reload --pgdata {{ postgresql_cluster_data_dir }}
 
 # TODO: move this to a separate role?
 - name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster members"
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
     src: "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}/32"
     to_port: "{{ postgresql_cluster_port | default('5433') }}"
     comment: "PostgreSQL {{ postgresql_cluster_name }} - host: {{ hostvars[item]['inventory_hostname'] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 - name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster clients"
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
     src: "{{ item.ip }}/{{ item.subnet_mask | default('32') }}"
     to_port: "{{ postgresql_cluster_port | default('5433') }}"
     comment: "Client {{ postgresql_cluster_name }} - client: {{ item.name }}"
-  with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
-  when: not (postgresql_cluster_is_monitor | default('False') | bool)
+    state: enabled
+  loop: "{{ postgresql_cluster_allowed_clients | default([]) | flatten(levels=1) }}"
+  when: (postgresql_cluster_allowed_clients | default('False') | bool) and not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "Allow incoming access to the postgres port {{ postgresql_cluster_port | default('5433') }} for all cluster clients"
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
     src: "{{ item.ip }}/{{ item.subnet_mask | default('32') }}"
     to_port: "{{ postgresql_cluster_port | default('5433') }}"
     comment: "Client {{ postgresql_cluster_name }} - client: {{ item.name }}"
-  with_items: "{{ postgresql_monitor_allowed_clients | default([]) }}"
-  when: (postgresql_cluster_is_monitor | default('False') | bool)
+    state: enabled
+  loop: "{{ postgresql_monitor_allowed_clients | default([]) | flatten(levels=1) }}"
+  when: (postgresql_cluster_allowed_clients | default('False') | bool) and (postgresql_cluster_is_monitor | default('False') | bool)
+

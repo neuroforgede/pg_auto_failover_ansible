@@ -1,0 +1,14 @@
+[Unit]
+Description = pg_auto_failover
+
+[Service]
+WorkingDirectory = /home/{{ postgresql_cluster_user }}
+Environment = 'PGDATA={{ postgresql_cluster_data_dir }}'
+User = {{ postgresql_cluster_user }}
+ExecStart = /usr/bin/pg_autoctl run
+Restart = always
+StartLimitBurst = 0
+ExecReload = /usr/bin/pg_autoctl reload
+
+[Install]
+WantedBy = multi-user.target

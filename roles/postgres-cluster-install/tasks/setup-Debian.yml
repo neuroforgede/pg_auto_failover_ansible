@@ -1,31 +1,31 @@
 ---
 - name: "pin postgres packages"
-  template:
+  ansible.builtin.template:
     src: "pgdg.preferences.j2"
     dest: "/etc/apt/preferences.d/pgdg"
     owner: root
     group: root
 
 - name: Ensure PostgreSQL Python libraries are installed.
-  apt:
+  ansible.builtin.apt:
     name: "{{ postgresql_cluster_python_library }}"
     state: present
   when: postgresql_cluster_python_library is defined
 
 - name: Ensure PostgreSQL Python libraries are installed via pip
-  pip:
+  ansible.builtin.pip:
     name: "{{ item }}"
     state: present
     executable: pip3
-  with_items: "{{ postgresql_cluster_python_pip_libraries }}"
+  loop: "{{ postgresql_cluster_python_pip_libraries | flatten(levels=1) }}"
   when: postgresql_cluster_python_pip_libraries is defined
 
 - name: Ensure PostgreSQL packages are installed.
-  apt:
+  ansible.builtin.apt:
     name: "{{ postgresql_cluster_packages }}"
     state: present
 
 - name: Ensure all configured locales are present.
-  locale_gen: "name={{ item }} state=present"
+  community.general.locale_gen: "name={{ item }} state=present"
   with_items: "{{ postgresql_cluster_locales }}"
   register: locale_gen_result

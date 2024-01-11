@@ -1,12 +1,12 @@
 ---
 - name: "check if server is standby (pg_is_in_recovery)"
-  shell: 
+  ansible.builtin.shell: 
     psql -p "{{ postgresql_cluster_port }}" -t -X -A -c 'select pg_is_in_recovery()'
   become_user: "{{ postgresql_cluster_user }}"
   register: pg_is_in_recovery
 
 - name: Ensure PostgreSQL xinetd user is present on the cluster.
-  postgresql_user:
+  community.postgresql.postgresql_user:
     name: "{{ postgresql_cluster_xinetd_user | default('postgres_xinetd') }}"
     login_host: "localhost"
     login_user: "{{ postgresql_cluster_user }}"
@@ -23,7 +23,7 @@
 
 - name: Ensure that the xinetd packages are installed
   become: true
-  package:
+  ansible.builtin.package:
     name: "xinetd"
     state: present
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
@@ -31,14 +31,14 @@
 - name: Ensure that xinetd is started and enabled on boot
   tags: xinetd
   become: true
-  service:
+  ansible.builtin.service:
     name: "xinetd"
     state: started
     enabled: yes
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: Template pgsqlchck script in place
-  template:
+  ansible.builtin.template:
     src: pgsqlchck.j2
     dest: /opt/pgsqlchk
     owner: "root"
@@ -47,7 +47,7 @@
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: Template pgsqlchck service into /etc/xinet.d
-  template:
+  ansible.builtin.template:
     src: pgsqlchck_xinetd.j2
     dest: /etc/xinetd.d/pgsqlchk
     owner: "root"
@@ -56,25 +56,25 @@
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "add pgsqlchck line to /etc/services"
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/services
     line: 'pgsqlchk 23267/tcp # Ansible Managed: pgsqlchk'
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "reload xinetd"
   become: true
-  service:
+  ansible.builtin.service:
     name: "xinetd"
     state: "reloaded"
     enabled: yes
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "Allow incoming access to the xinetd postgres port {{ postgresql_cluster_xinetd_port | default('23267') }} for all cluster clients"
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
     src: "{{ item.ip }}/{{ item.subnet_mask | default('32') }}"
     to_port: "{{ postgresql_cluster_xinetd_port | default('23267') }}"
     comment: "pgsqlchk xinetd {{ postgresql_cluster_name }} - client: {{ item.name }}"
-  with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
+  loop: "{{ postgresql_cluster_allowed_clients | default([]) | flatten(levels=1) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)

@@ -1,7 +1,15 @@
 ---
+- name: "Ensure postgres data directory exists and the permissions are set properly"
+  ansible.builtin.file:
+    path: "{{ postgresql_cluster_data_dir }}"
+    mode: '0755'
+    owner: "{{ postgresql_cluster_user }}"
+    group: "{{ postgresql_cluster_user }}"
+    state: directory
+
 - name: "run pg_autoctl create monitor"
   become_user: "{{ postgresql_cluster_user }}"
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl create monitor \
     --pgdata "{{ postgresql_cluster_data_dir }}" \
     --skip-pg-hba \

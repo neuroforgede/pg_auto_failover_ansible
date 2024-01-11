@@ -1,9 +1,9 @@
 ---
-- include_role:
+- ansible.builtin.include_role:
     name: postgres-cluster-hba-config
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
-- include_role:
+- ansible.builtin.include_role:
     name: postgres-cluster-configure
   vars:
     postgresql_cluster_skip_restart: true

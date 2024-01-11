@@ -9,39 +9,49 @@
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ---
 - name: "ensure /data/ansible exists"
-  file:
+  ansible.builtin.file:
     path: /data/ansible
+    mode: '700'
+    owner: "{{ postgresql_cluster_user }}"
+    group: "{{ postgresql_cluster_user }}"
     state: directory
 
 - name: "ensure /data/ansible/certs exists"
-  file:
+  ansible.builtin.file:
     path: /data/ansible/certs
+    mode: '700'
+    owner: "{{ postgresql_cluster_user }}"
+    group: "{{ postgresql_cluster_user }}"
     state: directory
 
 - name: "copy ssl certs to {{ item.directory }}"
-  copy:
+  ansible.builtin.copy:
     src: "{{ssl_certs_base_dir}}/{{ item.directory }}"
     dest: "/data/ansible/certs"
-    mode: 0700
+    mode: '700'
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
   when: not item.use_ids | default('False') | bool
-  with_items: "{{ ssl_cert_dirs }}"
+#  with_items: "{{ ssl_cert_dirs }}"
+  loop: "{{ ssl_cert_dirs|flatten(levels=1) }}"
 
 - name: "copy ssl certs to {{ item.directory }}"
-  copy:
+  ansible.builtin.copy:
     src: "{{ssl_certs_base_dir}}/{{ item.directory }}"
     dest: "/data/ansible/certs"
-    mode: 0700
+    mode: '700'
     owner: "{{ item.uid }}"
     group: "{{ item.gid }}"
   when: item.use_ids | default('False') | bool
-  with_items: "{{ ssl_cert_dirs }}"
+#  with_items: "{{ ssl_cert_dirs }}"
+  loop: "{{ ssl_cert_dirs|flatten(levels=1) }}"
 
 - name: "Ensure /data/ansible/certs/{{ item.directory }} is 0700"
-  command: chmod 700 /data/ansible/certs/{{ item.directory }}
-  with_items: "{{ ssl_cert_dirs }}"
+  ansible.builtin.command: chmod 700 /data/ansible/certs/{{ item.directory }}
+#  with_items: "{{ ssl_cert_dirs }}"
+  loop: "{{ ssl_cert_dirs|flatten(levels=1) }}"
 
 - name: "Ensure files in /data/ansible/certs/{{ item.directory }} 0400"
-  command: find /data/ansible/certs/{{ item.directory }} -type f -exec chmod 0400 {} \;
-  with_items: "{{ ssl_cert_dirs }}"
+  ansible.builtin.command: find /data/ansible/certs/{{ item.directory }} -type f -exec chmod 0400 {} \;
+#  with_items: "{{ ssl_cert_dirs }}"
+  loop: "{{ ssl_cert_dirs|flatten(levels=1) }}"

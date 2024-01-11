@@ -1,33 +1,36 @@
 ---
 
 - name: Check if PostgreSQL database is initialized.
-  stat:
+  ansible.builtin.stat:
     path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
-- name: "copy deb.sh to /tmp/pg_auto_failover_deb.sh"
-  copy:
-    src: "deb.sh"
-    dest: "/tmp/pg_auto_failover_deb.sh"
-    owner: root
-    group: root
-    mode: 0700
+- name: Download deb.sh from Citus
+  ansible.builtin.get_url:
+    url: https://install.citusdata.com/community/deb.sh
+    dest: /tmp/deb.sh
+
+- name: "run /tmp/deb.sh"
+  ansible.builtin.command:
+    cmd: bash /tmp/deb.sh
   when: not pgdata_dir_version.stat.exists
 
-- name: "run /tmp/pg_auto_failover_deb.sh"
-  command: "bash /tmp/pg_auto_failover_deb.sh"
-  when: not pgdata_dir_version.stat.exists
-
-- name: "install pg-auto-failover-cli-{{ postgresql_pg_auto_failover_version }}"
-  apt: 
-    name: "pg-auto-failover-cli-{{ postgresql_pg_auto_failover_version }}"
+- name: "install pg-auto-failover-cli"
+  ansible.builtin.apt:
+    name: "pg-auto-failover-cli"
     state: present
     update_cache: "{{ apt_update_cache | default('True') }}"
   when: not pgdata_dir_version.stat.exists
 
-- name: "install postgresql-{{ postgresql_cluster_version }}-auto-failover-{{ postgresql_pg_auto_failover_version }}"
-  apt: 
-    name: "postgresql-{{ postgresql_cluster_version }}-auto-failover-{{ postgresql_pg_auto_failover_version }}"
+- name: "install postgresql-{{ postgresql_cluster_version }}-auto-failover"
+  ansible.builtin.apt:
+    name: "postgresql-{{ postgresql_cluster_version }}-auto-failover"
     state: present
     update_cache: "{{ apt_update_cache | default('True') }}"
   when: not pgdata_dir_version.stat.exists
+
+- name: "Make sure default postgres service is stopped and disabled"
+  ansible.builtin.systemd_service:
+    state: stopped
+    enabled: false
+    name: postgresql

@@ -1,8 +1,26 @@
 ---
+- name: pull out scram-sha-256 hashes for building out userlist.txt
+  ansible.builtin.shell:
+    psql -p "{{ postgresql_cluster_port }}" -t -X -A -c "select rolpassword from pg_authid where rolname = '{{ item.name }}'"
+  become_user: "{{ postgresql_cluster_user }}"
+  loop: "{{ postgresql_cluster_users | default([]) | flatten(levels=1) }}"
+  when: not (postgresql_cluster_is_monitor | default('False') | bool) and (inventory_hostname == play_hosts[1])
+  register: passsword_hashes
 
-- name: Template userlist.txt into /etc/pgbouncer/userlist.txt
-  template:
+- name: Template userlist.txt onto localhost in preparation to copy file to hosts at /etc/pgbouncer/userlist.txt
+  ansible.builtin.template:
     src: userlist.txt.j2
+    dest: "{{ playbook_dir }}/roles/postgres-cluster-pgbouncer-client-setup/userlist.txt"
+#/etc/pgbouncer/userlist.txt
+    owner: "fred"
+    group: "fred"
+    mode: 0644
+  when: not (postgresql_cluster_is_monitor | default('False') | bool) and (inventory_hostname == play_hosts[1])
+  delegate_to: localhost
+
+- name: copy generated userlist.txt to hosts
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/roles/postgres-cluster-pgbouncer-client-setup/userlist.txt"
     dest: /etc/pgbouncer/userlist.txt
     owner: "{{ postgresql_cluster_user | default('postgres') }}"
     group: "{{ postgresql_cluster_group | default('postgres') }}"
@@ -10,19 +28,24 @@
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "Allow incoming access to the pgbouncer port {{ postgresql_cluster_pg_bouncer_listen_port | default('6432') }} for all cluster clients"
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
     src: "{{ item.ip }}/{{ item.subnet_mask | default('32') }}"
     to_port: "{{ postgresql_cluster_pg_bouncer_listen_port | default('6432') }}"
     comment: "pgbouncer {{ postgresql_cluster_name }} - client: {{ item.name }}"
-  with_items: "{{ postgresql_cluster_allowed_clients | default([]) }}"
+  loop: "{{ postgresql_cluster_allowed_clients | flatten(levels=1) | default([]) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "reload pgbouncer"
   become: true
-  service:
+  ansible.builtin.service:
     name: "pgbouncer"
     state: "reloaded"
     enabled: yes
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
+
+- name: Remove userlist.txt from local machine as it is no longer needed.
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/roles/postgres-cluster-pgbouncer-client-setup/userlist.txt"
+    state: absent

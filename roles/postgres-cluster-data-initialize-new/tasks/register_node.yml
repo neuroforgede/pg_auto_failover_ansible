@@ -1,2 +1,2 @@
 ---
-- include_tasks: "register_node_{{ postgresql_pg_auto_failover_version }}.yml"
+- ansible.builtin.include_tasks: "register_node_{{ postgresql_pg_auto_failover_version }}.yml"

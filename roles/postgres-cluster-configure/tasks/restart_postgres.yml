@@ -1,11 +1,11 @@
 ---
 - name: "reload cluster config"
   become_user: postgres
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_ctl reload --pgdata {{ postgresql_cluster_data_dir }}
   
 - name: "restart pg_auto_failover service"
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: not (postgresql_cluster_skip_restart | default('False') | bool)

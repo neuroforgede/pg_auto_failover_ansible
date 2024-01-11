@@ -2,19 +2,20 @@
 ---
 
 - name: Check if PostgreSQL database is initialized.
-  stat:
+  ansible.builtin.stat:
     path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
 - name: check if pg_autoctl already knows about this postgres cluster
-  stat:
+  ansible.builtin.stat:
     path: "/home/postgres/.local/share/pg_autoctl/{{ postgresql_cluster_data_dir }}"
   register: pg_autoctl_dir
 
 - name: Check if service is already set up
-  stat:
+  ansible.builtin.stat:
     path: "/etc/systemd/system/{{ postgresql_cluster_daemon }}.service"
   register: postgresql_cluster_daemon_service_file
 
-- include_tasks: existing_node.yml
+- ansible.builtin.include_tasks:
+    file: existing_node.yml
   when: (pg_autoctl_dir.stat.exists) and (pgdata_dir_version.stat.exists) and (postgresql_cluster_daemon_service_file.stat.exists) and not (postgresql_cluster_is_monitor | default('False') | bool)
