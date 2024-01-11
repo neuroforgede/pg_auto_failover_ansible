@@ -3,12 +3,12 @@
 
 - name: Add Postgres packages repo apt key
   become: yes
-  apt_key:
+  ansible.builtin.apt_key:
     data: "{{ lookup('file', 'postgres12.asc') }}"
     state: present
 
 - name: Add postgres repo http://apt.postgresql.org/pub/repos/apt/
   become: yes
-  apt_repository: 
+  ansible.builtin.apt_repository: 
     repo: "{{ postgresql_repository }}"
     state: present

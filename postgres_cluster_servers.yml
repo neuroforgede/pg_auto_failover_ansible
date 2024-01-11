@@ -22,6 +22,7 @@
         owner: "{{ postgresql_cluster_user | default('postgres') }}"
         group: "{{ postgresql_cluster_group | default('postgres') }}"
   roles:
+    - role: postgres-cluster-load-vars
     - role: user-setup
     - role: force-reconnect
     - role: copy-ssl-certs

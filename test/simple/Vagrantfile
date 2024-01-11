@@ -1,21 +1,24 @@
 Vagrant.configure("2") do |config|
   config.vm.define :monitor do |monitor|
-    monitor.vm.box = "ubuntu/bionic64"
-    monitor.vm.network :private_network, ip: "10.0.0.10"
+    monitor.vm.box = "generic/ubuntu2004"
+    monitor.vm.network :private_network, :ip => "10.0.0.10"
+#    monitor.vm.network :pg_test_network, ip: "10.0.0.10"
     monitor.vm.hostname = "monitor"
     monitor.vm.network :forwarded_port, guest: 22, host: 2200, id: 'ssh'
   end
 
   config.vm.define :node1 do |node1|
-    node1.vm.box = "ubuntu/bionic64"
-    node1.vm.network :private_network, ip: "10.0.0.11"
+    node1.vm.box = "generic/ubuntu2004"
+    node1.vm.network :private_network, :ip => "10.0.0.11"
+#    node1.vm.network :pg_test_network, ip: "10.0.0.11"
     node1.vm.hostname = "node1"
     node1.vm.network :forwarded_port, guest: 22, host: 2201, id: 'ssh'
   end
 
   config.vm.define :node2 do |node2|
-    node2.vm.box = "ubuntu/bionic64"
-    node2.vm.network :private_network, ip: "10.0.0.12"
+    node2.vm.box = "generic/ubuntu2004"
+    node2.vm.network :private_network, :ip => "10.0.0.12"
+#    node2.vm.network :pg_test_network, ip: "10.0.0.12"
     node2.vm.hostname = "node2"
     node2.vm.network :forwarded_port, guest: 22, host: 2202, id: 'ssh'
   end

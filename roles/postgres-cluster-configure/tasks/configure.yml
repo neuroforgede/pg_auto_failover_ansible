@@ -1,19 +1,20 @@
 ---
 - name: Configure global settings.
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "{{ postgresql_cluster_config_path }}/postgresql.conf"
     regexp: "^#?{{ item.option }}.+$"
     line: "{{ item.option }} = '{{ item.value }}'"
     state: "{{ item.state | default('present') }}"
-  with_items: "{{ postgresql_cluster_global_config_options }}"
+  loop: "{{ postgresql_cluster_global_config_options|flatten(levels=1) }}"
 
-- include_tasks: "restart_postgres.yml"
+- ansible.builtin.include_tasks:
+    file: restart_postgres.yml
 
 - name: Ensure PostgreSQL unix socket dirs exist.
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ postgresql_cluster_user }}"
     group: "{{ postgresql_cluster_group }}"
     mode: "{{ postgresql_cluster_unix_socket_directories_mode }}"
-  with_items: "{{ postgresql_cluster_unix_socket_directories }}"
+  loop: "{{ postgresql_cluster_unix_socket_directories|flatten(levels=1) }}"

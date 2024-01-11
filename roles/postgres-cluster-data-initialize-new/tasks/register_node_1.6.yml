@@ -2,9 +2,9 @@
 - name: "compute monitor_nodes_list"
   vars:
     monitor_node_ip : "{{ hostvars[item]['host_ip'] | default(hostvars[item]['ansible_host']) }}"
-  set_fact:
+  ansible.builtin.set_fact:
     postgresql_cluster_monitor_node_ips: "{{ (postgresql_cluster_monitor_node_ips | default([])) + [monitor_node_ip] }}"
-  with_items: "{{ groups['postgres_cluster'] | default([]) }}"
+  loop: "{{ groups['postgres_cluster'] | default([]) | flatten(levels=1) }}"
 
 
 # TODO: add support for crl files
@@ -19,7 +19,7 @@
   poll: 10
   vars:
     first_monitor_node: "{{ postgresql_cluster_monitor_node_ips | first }}"
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl create postgres \
     --pgdata "{{ postgresql_cluster_data_dir }}" \
     --skip-pg-hba \

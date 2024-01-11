@@ -11,7 +11,7 @@
 # careful: this is executed on the management node as well, so this should
 # really only include _essential_ software
 - name: Install essential packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     update_cache: "{{ apt_update_cache | default('True') }}"
   vars:
@@ -20,11 +20,10 @@
     - ufw
     - sudo
     - python-setuptools
-    - python-passlib
     - acl
 
 - name: Install essential packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     update_cache: "{{ apt_update_cache | default('True') }}"
   vars:
@@ -33,7 +32,7 @@
   when: ansible_distribution != 'Ubuntu' or ansible_distribution_version is version('20.04', '<')
 
 - name: Install essential packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ packages }}"
     update_cache: "{{ apt_update_cache | default('True') }}"
   vars:
@@ -41,19 +40,23 @@
     - python3-pip
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('20.04', '>=')
 
+- name: Install passlib with pip
+  ansible.builtin.pip:
+    name: passlib
+
 - name: configure and enable ufw
   remote_user: root
   become: true
   block:
     - name: Allow ssh connections via ipv4
-      ufw:
+      community.general.ufw:
         rule: allow
         proto: tcp
         to: 0.0.0.0/0
         port: "22"
-        
+
     - name: Allow ssh ipv6 connections via loopback
-      ufw:
+      community.general.ufw:
         rule: allow
         proto: tcp
         from: ::1
@@ -61,7 +64,7 @@
         port: "22"
 
     - name: Allow ssh ipv6 connections to ipv6 floating ip if configured
-      ufw:
+      community.general.ufw:
         rule: allow
         proto: tcp
         to: "{{ floating_ipv6 }}"
@@ -69,15 +72,17 @@
       when: floating_ipv6 is defined
 
     - name: Enable ufw
-      ufw:
+      community.general.ufw:
         state: enabled
 
 - name: molly guard
-  include_tasks: subtasks/molly-guard.yml
+  ansible.builtin.include_tasks:
+    file: subtasks/molly-guard.yml
 
-- set_fact:
+- name: determine if we are disabling ipv6
+  ansible.builtin.set_fact:
     setup_disable_ipv6_val: "{{ setup_disable_ipv6 | default('False') }}"
 
 - name: Disable ipv6
-  raw: echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
+  ansible.builtin.raw: echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
   when: setup_disable_ipv6_val|bool

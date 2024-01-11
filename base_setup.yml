@@ -1,35 +1,47 @@
 - hosts: all
   become: true
-  gather_facts: False
+  gather_facts: True
   tasks:
-    # ansible only requires only a minimal installation of python 2.x on the managed machines
-    - name: "ansible required: install python"
-      raw: python3 -c "import simplejson" || (DEBIAN_FRONTEND=noninteractive apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install python3-minimal -y && DEBIAN_FRONTEND=noninteractive apt-get install python3-simplejson -y)
+    - name: "Check if python is installed"
+      ansible.builtin.raw: python3 --version
+      register: python_check
+      ignore_errors: true
+      when: ansible_distribution == 'Ubuntu'
+    - name: "Install Python"
+      environment:
+        DEBIAN_FRONTEND: 'noninteractive'
+      ansible.builtin.raw: apt-get -y install python3-minimal python3-simplejson
+      when: python_check.rc != 0
 
 - hosts: all
   become: true
   tasks:
     - name: "set up bashrc for root user"
-      copy:
+      ansible.builtin.copy:
         src: "{{ playbook_dir }}/roles/user-setup/files/.bashrc"
         dest: "/root/.bashrc"
         owner: "0"
         group: "0"
         mode: 0600
-        
+
 - hosts: all
   become: true
   tasks:
     - name: Ensure the en_US locale exists
-      locale_gen:
+      community.general.locale_gen:
         name: en_US.UTF-8
         state: present
     - name: set en_US as default locale
-      command: update-locale set-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+      ansible.builtin.command:
+        cmd: update-locale set-locale
+      environment:
+        LANG: en_US.UTF-8
+        LC_ALL: en_US.UTF-8
+      when: ansible_distribution == 'Ubuntu'
 
 - hosts: all
   become: true
-  vars:   
+  vars:
     apt_update_cache: True
     apt_restart_after_dist_upgrade: True
   roles:

@@ -1,5 +1,5 @@
 - name: Ensure PostgreSQL database schema is present.
-  postgresql_schema:
+  community.postgresql.postgresql_schema:
     name: "{{ schema_def.name }}"
     database: "{{ database.name }}"
     login_host: "{{ database.login_host | default('localhost') }}"
@@ -17,4 +17,4 @@
   when: (not (postgresql_cluster_is_monitor | default('False') | bool)) and schema_def.name is defined and pg_is_in_recovery.stdout_lines[0] == 'f'
   loop_control:
     loop_var: "schema_def"
-  with_items: "{{ database.schemas | default([]) }}"
+  loop: "{{ database.schemas | flatten(levels=1) | default([]) }}"

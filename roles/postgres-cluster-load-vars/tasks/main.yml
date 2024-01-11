@@ -1,66 +1,68 @@
 ---
 # Variable configuration.
 - name: Include OS-specific variables (Debian).
-  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
   when: ansible_os_family == 'Debian'
 
-- name: Define postgresql_cluster_packages.
-  set_fact:
+- name: "Define postgresql_cluster_packages."
+  ansible.builtin.set_fact:
     postgresql_cluster_packages: "{{ __postgresql_cluster_packages | list }}"
   when: postgresql_cluster_packages is not defined
 
-- name: Define postgresql_cluster_version.
-  set_fact:
+- name: "Define postgresql_cluster_version."
+  ansible.builtin.set_fact:
     postgresql_cluster_version: "{{ __postgresql_cluster_version }}"
-  when: postgresql_cluster_version is not defined
+#  when: postgresql_cluster_version is not defined
 
 - name: "Define postgresql_pg_auto_failover_version."
-  set_fact:
+  ansible.builtin.set_fact:
     postgresql_pg_auto_failover_version: "{{ __postgresql_pg_auto_failover_version }}"
-  when: postgresql_pg_auto_failover_version is not defined
+#  when: postgresql_pg_auto_failover_version is not defined
 
 - name: "Define postgresql_cluster_user."
-  set_fact:
+  ansible.builtin.set_fact:
     postgresql_cluster_user: "{{ __postgresql_cluster_user }}"
   when: postgresql_cluster_user is not defined
 
 - name: "Define postgresql_cluster_restarted_state."
-  set_fact:
+  ansible.builtin.set_fact:
     postgresql_cluster_restarted_state: "{{ __postgresql_cluster_restarted_state }}"
   when: postgresql_cluster_restarted_state is not defined
 
 - name: "Define postgresql_repository."
-  set_fact:
+  ansible.builtin.set_fact:
     postgresql_repository: "{{ __postgresql_repository }}"
   when: postgresql_repository is not defined
 
-- name: Define postgresql_cluster_daemon.
-  set_fact:
+- name: "Define postgresql_cluster_daemon."
+  ansible.builtin.set_fact:
     postgresql_cluster_daemon: "{{ __postgresql_cluster_daemon }}"
   when: postgresql_cluster_daemon is not defined
 
-- name: Define postgresql_cluster_data_dir.
-  set_fact:
+- name: "Define postgresql_cluster_data_dir."
+  ansible.builtin.set_fact:
     postgresql_cluster_data_dir: "{{ __postgresql_cluster_data_dir }}"
   when: postgresql_cluster_data_dir is not defined
 
-- name: Define postgresql_cluster_port.
-  set_fact:
+- name: "Define postgresql_cluster_port."
+  ansible.builtin.set_fact:
     postgresql_cluster_port: "{{ __postgresql_cluster_port }}"
   when: postgresql_cluster_port is not defined
 
-- name: Define postgresql_cluster_bin_path.
-  set_fact:
+- name: "Define postgresql_cluster_bin_path."
+  ansible.builtin.set_fact:
     postgresql_cluster_bin_path: "{{ __postgresql_cluster_bin_path }}"
   when: postgresql_cluster_bin_path is not defined
 
-- name: Define postgresql_cluster_config_path.
-  set_fact:
+- name: "Define postgresql_cluster_config_path."
+  ansible.builtin.set_fact:
     postgresql_cluster_config_path: "{{ __postgresql_cluster_config_path }}"
   when: postgresql_cluster_config_path is not defined
 
-- name: Define postgresql_cluster_unix_socket_directories_mode.
-  set_fact:
+- name: "Define postgresql_cluster_unix_socket_directories_mode."
+  ansible.builtin.set_fact:
     postgresql_cluster_unix_socket_directories_mode: >-
       {{ __postgresql_cluster_unix_socket_directories_mode | default('02775') }}
   when: postgresql_cluster_unix_socket_directories_mode is not defined
+
+

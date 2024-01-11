@@ -21,8 +21,8 @@ postgresql_cluster_pg_bouncer_client_tls_sslmode: "require"
 postgresql_cluster_pg_bouncer_root_password: "pgbouncerpassword"
 
 postgresql_cluster_hba_entries:
-  - { type: hostssl, database: "testdb", address: "10.0.0.0/24", user: "testuser", auth_method: md5, auth_options: "clientcert=0" }
-  - { type: hostssl, database: "testdb2", address: "10.0.0.0/24", user: "testuser", auth_method: md5, auth_options: "clientcert=0" }
+  - { type: hostssl, database: "testdb", address: "10.0.0.0/24", user: "testuser", auth_method: scram-sha-256, auth_options: "clientcert=0" }
+  - { type: hostssl, database: "testdb2", address: "10.0.0.0/24", user: "testuser", auth_method: scram-sha-256, auth_options: "clientcert=0" }
   #- { type: local, database: all, user: postgres, auth_method: peer }
   # add your entries for your manually created databases here
 

@@ -1,6 +1,6 @@
 ---
 - name: "ensure /data/ansible/pg_dump exists"
-  file:
+  ansible.builtin.file:
     path: /data/ansible/pg_dump
     state: directory
     owner: "root"
@@ -8,12 +8,12 @@
     # pg_dump apparently wants to cd back to the directory
     mode: 0711
 
-- stat:
+- ansible.builtin.stat:
     path: /data/ansible/pg_dumps
   register: pg_dumps_link
 
 - name: "ensure /data/ansible/pg_dumps exists"
-  file:
+  ansible.builtin.file:
     path: /data/ansible/pg_dumps
     state: directory
     owner: "postgres"
@@ -22,7 +22,7 @@
   when: not (pg_dumps_link.stat.islnk is defined and pg_dumps_link.stat.islnk)
 
 - name: copy dump_all.sh script
-  template:
+  ansible.builtin.template:
     src: dump_all.sh.j2
     dest: /data/ansible/pg_dump/dump_all.sh
     owner: "root"
@@ -30,7 +30,7 @@
     mode: 0700
 
 - name: copy start_dump.sh script
-  copy:
+  ansible.builtin.copy:
     src: start_dump.sh
     dest: /data/ansible/pg_dump/start_dump.sh
     owner: "root"
@@ -39,14 +39,14 @@
     
 - name: Create cronjob for postgres dump
   when: "not (postgres_backup_enabled | default(False) | bool)"
-  cron:
+  ansible.builtin.cron:
     name: "start automatic postgres dump"
     user: "root"
     state: absent
     
 - name: Create cronjob for postgres dump
   when: "postgres_backup_enabled | default(False) | bool"
-  cron:
+  ansible.builtin.cron:
     name: "start automatic postgres dump"
     user: "root"
     minute: "0"

@@ -6,9 +6,10 @@ Ansible Playbook(s) to create a cluster of PostgreSQL nodes running in a Ubuntu 
 ## Current features
 
 - Automatically setup a secure cluster with 1 monitor node and 2 database nodes with synchronous replication
-- Support for Ubuntu 18.04/Ubuntu 20.04
-- Support for PostgreSQL 12/13/14
+- Support for Ubuntu 20.04/Ubuntu 22.04
+- Support for PostgreSQL 14/15/16
 - Support for rudimentary pgbouncer setup (not enabled by default)
+- Fully updated to support scram-sha-256 including pgbouncer
 
 ## Not features
 
@@ -49,7 +50,7 @@ When upgrading from a version >= 1.4:
 Requirements:
 
 - vagrant
-- virtualbox
+- virtualbox (libvirt is supported now)
 - psql
 
 To test out the functionality and/or want to run the tests for this project, go to `test/` and run `bash setup_for_test.sh` and then `run.sh`.
@@ -94,6 +95,7 @@ This will copy all certificates into the correct place for them to be picked up 
 
 
 ### Run base setup
+NOTE: cleanup.sh file in test/simple directory runs these two commands for you now if you are repeatedly needing to clean these up.
 
 0. remove existing ssh keys of you machines into your known hosts (only run this if you have rebuilt your machines and the ssh key has changed):
 
@@ -127,7 +129,7 @@ ansible-playbook -i inventories/pg_auto_failover/hosts.yml postgres_cluster_serv
 ```bash
 ssh -i ssh_keys/root_rsa root@<manager-ip>
 sudo su postgres
-XDG_RUNTIME_DIR="" pg_autoctl show state --pgdata  /var/lib/postgresql/12/main_cluster/
+XDG_RUNTIME_DIR="" pg_autoctl show state --pgdata  /var/lib/postgresql/16/main_cluster/
 ```
 
 If everything is okay, you should be greeted with the following:
@@ -144,7 +146,7 @@ If everything is okay, you should be greeted with the following:
 Just ask the monitor node :)
 
 ```bash
-XDG_RUNTIME_DIR="" pg_autoctl show uri --pgdata  /var/lib/postgresql/12/main_cluster/
+XDG_RUNTIME_DIR="" pg_autoctl show uri --pgdata  /var/lib/postgresql/16/main_cluster/
 ```
 
 ![](connection_strings.png)

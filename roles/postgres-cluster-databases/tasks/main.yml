@@ -1,12 +1,12 @@
 ---
 - name: "check if server is standby (pg_is_in_recovery)"
-  shell: 
+  ansible.builtin.shell: 
     psql -p "{{ postgresql_cluster_port }}" -t -X -A -c 'select pg_is_in_recovery()'
   become_user: "{{ postgresql_cluster_user }}"
   register: pg_is_in_recovery
 
 - name: Ensure PostgreSQL databases are present.
-  postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ item.name }}"
     lc_collate: "{{ item.lc_collate | default('en_US.UTF-8') }}"
     lc_ctype: "{{ item.lc_ctype | default('en_US.UTF-8') }}"
@@ -19,7 +19,7 @@
     port: "{{ item.port | default(postgresql_cluster_port) }}"
     owner: "{{ item.owner | default(postgresql_cluster_user) }}"
     state: "{{ item.state | default('present') }}"
-  with_items: "{{ postgresql_cluster_databases | default([]) }}"
+  loop: "{{ postgresql_cluster_databases | default([]) | flatten(levels=1) }}"
   become: true
   become_user: "{{ postgresql_cluster_user }}"
   # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
@@ -28,7 +28,8 @@
   when: not (postgresql_cluster_is_monitor | default('False') | bool) and pg_is_in_recovery.stdout_lines[0] == 'f'
 
 
-- include_tasks: add_schemas.yml
+- ansible.builtin.include_tasks:
+    file: add_schemas.yml
   vars:
     database: "{{ item }}"
-  with_items: "{{ postgresql_cluster_databases | default([]) }}"
+  loop: "{{ postgresql_cluster_databases | default([]) | flatten(levels=1) }}"

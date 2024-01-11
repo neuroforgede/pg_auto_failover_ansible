@@ -1,10 +1,10 @@
 ---
-- include_role:
+- ansible.builtin.include_role:
     name: postgres-cluster-hba-config
 
 - name: "check state on each data node"
   become_user: "{{ postgresql_cluster_user }}"
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl show state \
     --pgdata "{{ postgresql_cluster_data_dir }}" \
     --json
@@ -12,28 +12,28 @@
   register: pg_autoctl_state
 
 - name: Populate dict for state information
-  set_fact:
+  ansible.builtin.set_fact:
     pg_autoctl_cluster_state: "{{ pg_autoctl_cluster_state|default({}) | combine( {item.nodename: item} ) }}"
-  with_items:
-    - "{{ pg_autoctl_state.stdout | from_json }}"
+  loop:
+    - "{{ pg_autoctl_state.stdout | from_json | flatten(levels=1) }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "fail if any node has current_group_state != assigned_group_state"
-  fail:
+  ansible.builtin.fail:
     msg: "assigned group state differs from current group state"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
     and (pg_autoctl_cluster_state[host_ip].assigned_group_state != pg_autoctl_cluster_state[host_ip].current_group_state)
 
 - name: "enable maintenance mode on secondaries"
   become_user: "{{ postgresql_cluster_user }}"
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl enable maintenance \
     --pgdata "{{ postgresql_cluster_data_dir }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
     and (pg_autoctl_cluster_state[host_ip].assigned_group_state == 'secondary')
 
 - name: "copy deb.sh to /tmp/pg_auto_failover_deb.sh"
-  copy:
+  ansible.builtin.copy:
     src: "deb.sh"
     dest: "/tmp/pg_auto_failover_deb.sh"
     owner: root
@@ -41,40 +41,43 @@
     mode: 0700
 
 - name: "run /tmp/pg_auto_failover_deb.sh"
-  command: "bash /tmp/pg_auto_failover_deb.sh"
+  ansible.builtin.command:
+    cmd: bash /tmp/pg_auto_failover_deb.sh
+  args:
+    creates: '/etc/apt/sources.list.d/citusdata_community.list'
 
 - name: "uninstall postgresql-{{ postgresql_cluster_version }}-auto-failover-{{ postgresql_pg_auto_failover_version }}"
-  apt: 
+  ansible.builtin.apt: 
     name: "postgresql-{{ postgresql_cluster_version }}-auto-failover-{{ postgresql_pg_auto_failover_version }}"
     state: absent
     update_cache: "{{ apt_update_cache | default('True') }}"
 
 - name: "uninstall pg-auto-failover-cli-{{ postgresql_pg_auto_failover_version }}"
-  apt: 
+  ansible.builtin.apt: 
     name: "pg-auto-failover-cli-{{ postgresql_pg_auto_failover_version }}"
     state: absent
     update_cache: "{{ apt_update_cache | default('True') }}"
 
 - name: "install postgresql-{{ postgresql_cluster_version }}-auto-failover-{{ postgresql_new_pg_auto_failover_version }}"
-  apt: 
+  ansible.builtin.apt: 
     name: "postgresql-{{ postgresql_cluster_version }}-auto-failover-{{ postgresql_new_pg_auto_failover_version }}"
     state: present
     update_cache: "{{ apt_update_cache | default('True') }}"
 
 - name: "install pg-auto-failover-cli-{{ postgresql_new_pg_auto_failover_version }}"
-  apt: 
+  ansible.builtin.apt: 
     name: "pg-auto-failover-cli-{{ postgresql_new_pg_auto_failover_version }}"
     state: present
     update_cache: "{{ apt_update_cache | default('True') }}"
 
 - name: "restart monitor pg_auto_failover service"
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "restart monitor pg_auto_failover service once more"
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
@@ -84,7 +87,7 @@
   async: "{{ postgresql_cluster_monitor_upgrade_timeout | default(300) | int }}"
   # poll every 5 seconds to see if we are finished
   poll: 5
-  shell: |
+  ansible.builtin.shell: |
     counter=1
 
     echo "restarting monitor..."
@@ -109,44 +112,46 @@
   when: (postgresql_cluster_is_monitor | default('False') | bool)
   register: pg_autoctl_monitor_upgrade
 
-- debug:
+- name: Setup debug variable from stdout
+  ansible.builtin.debug:
     var: pg_autoctl_monitor_upgrade.stdout
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "restart monitor pg_auto_failover service after upgrade was successful"
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "restart pg_auto_failover service on all data nodes"
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "check state on each data node"
   become_user: "{{ postgresql_cluster_user }}"
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl show state \
     --pgdata "{{ postgresql_cluster_data_dir }}" \
     --json
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
   register: pg_autoctl_state
 
-- debug:
+- name: Setup debug variable to track the autoctl state
+  ansible.builtin.debug:
     var: pg_autoctl_state
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "ensure pg_auto_failover service is started on all nodes"
-  service:
+  ansible.builtin.service:
     name: "{{ postgresql_cluster_daemon }}"
     state: "{{ postgresql_cluster_restarted_state }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "disable maintenance mode on secondaries"
   become_user: "{{ postgresql_cluster_user }}"
-  shell: >
+  ansible.builtin.shell: >
     PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl disable maintenance \
     --pgdata "{{ postgresql_cluster_data_dir }}"
   when: not (postgresql_cluster_is_monitor | default('False') | bool)

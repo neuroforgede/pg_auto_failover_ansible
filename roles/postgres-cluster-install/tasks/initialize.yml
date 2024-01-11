@@ -1,6 +1,6 @@
 ---
 - name: Set PostgreSQL environment variables.
-  template:
+  ansible.builtin.template:
     src: postgres.sh.j2
     dest: /etc/profile.d/postgres.sh
     mode: 0644

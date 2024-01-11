@@ -2,41 +2,46 @@
 ---
 
 - name: Check if PostgreSQL database is initialized.
-  stat:
+  ansible.builtin.stat:
     path: "{{ postgresql_cluster_data_dir }}/PG_VERSION"
   register: pgdata_dir_version
 
 
 - name: check if pg_autoctl already knows about this postgres cluster
-  stat:
+  ansible.builtin.stat:
     path: "/home/postgres/.local/share/pg_autoctl/{{ postgresql_cluster_data_dir }}"
   register: pg_autoctl_dir
 
 # explicitly do not remove the data dir here, we do not want to delete database clusters by accident
 
 # TODO: add support for crl files
-- include_tasks: "monitor_init_{{ postgresql_pg_auto_failover_version }}.yml"
+- name: Initialize the Monitor
+  ansible.builtin.include_tasks: "monitor_init_{{ postgresql_pg_auto_failover_version }}.yml"
   when: (not pg_autoctl_dir.stat.exists) and (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
 
-- name: "create systemd config for cluster"
-  shell: >
-    su -c 'PATH="$PATH:{{ postgresql_cluster_bin_path }}" pg_autoctl -q show systemd --pgdata "{{ postgresql_cluster_data_dir }}"' postgres \
-    | tee /etc/systemd/system/{{ postgresql_cluster_daemon }}.service
+- name: "Create systemd config for cluster"
+  ansible.builtin.template:
+    src: templates/postgres.service.j2
+    dest: /lib/systemd/system/{{ postgresql_cluster_daemon }}.service
+    owner: root
+    group: root
+    mode: '0644'
   when: (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
 
 - name: "make sure database cluster service is started and enabled at boot"
-  systemd:
+  ansible.builtin.systemd:
     state: started
     enabled: true
+    masked: false
     daemon_reload: yes
     name: "{{ postgresql_cluster_daemon }}"
   when: (not pgdata_dir_version.stat.exists) and (postgresql_cluster_is_monitor | default('False') | bool)
 
-- include_role:
+- ansible.builtin.include_role:
     name: postgres-cluster-hba-config
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 
-- include_role:
+- ansible.builtin.include_role:
     name: postgres-cluster-configure
   when: (postgresql_cluster_is_monitor | default('False') | bool)
 

@@ -1,0 +1,5 @@
+collections:
+  - name: community.general
+    version: 8.1.0
+  - name: community.postgresql
+    version: 3.3.0
